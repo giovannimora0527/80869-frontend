@@ -1,5 +1,4 @@
-<div class="container">
-  <!-- Content here -->
+<div class="container">  
   <div class="card">
     <div class="card-header">
       <h3>
@@ -25,7 +24,7 @@
               <td>{{ usuario.id }}</td>
               <td>{{ usuario.username }}</td>
               <td>{{ usuario.rol }}</td>
-              <td>{{ usuario.fechaCreacion }}</td>
+              <td>{{ usuario.fechaCreacion | date: "yyyy-MM-dd HH:mm" }}</td>
               <td>{{ usuario.activo === true? "Activo": "Inactivo" }}</td>
               <td><button class="btn btn-outline-primary" (click)="probarBoton(usuario)"><i class="fa fa-edit"></i>&nbsp;Editar</button></td>
             </tr>

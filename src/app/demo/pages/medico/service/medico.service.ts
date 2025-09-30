@@ -2,18 +2,18 @@ import { Injectable } from '@angular/core';
 import { Observable } from 'rxjs';
 import { BackendService } from 'src/app/services/backend.service';
 import { environment } from 'src/environments/environment';
-import { Usuario } from '../models/usuario'
+import { Medico } from '../models/medico';
 
 @Injectable({
   providedIn: 'root'
 })
-export class UsuarioService {
+export class MedicoService {
   apiUrl = environment.apiUrl;
-  endpoint = 'usuario';  
+  endpoint = 'medico';
 
-  constructor(private readonly backendService: BackendService) { }
+  constructor(private readonly backendService: BackendService) {}
 
-  listarUsuarios(): Observable<Usuario[]> {
+  listarMedicos(): Observable<Medico[]> {
     return this.backendService.get(this.apiUrl, this.endpoint, 'listar');
   }
 }

@@ -1,0 +1,52 @@
+<div class="container">
+  <div class="card">
+    <div class="card-header">
+      <div class="row">
+        <div class="col d-flex">
+          <h3 class="mb-0">
+            <i class="fa fa-users"></i>
+            Mis Pacientes
+          </h3>
+        </div>
+      </div>
+    </div>
+    <div class="card-body">
+      <div class="table-responsive">
+        <table class="table table-striped table-hover">
+          <thead>
+            <tr>
+              <td>Tipo de documento</td>
+              <td>#. Documento</td>
+              <td>Nombres</td>
+              <td>Apellidos</td>
+              <td>Fecha de nacimiento</td>
+              <td>Género</td>
+              <td>Teléfono</td>
+              <td>Dirección</td>
+              <td>Acciones</td>
+            </tr>
+          </thead>
+           <tbody *ngIf="pacienteList.length > 0">
+            <tr *ngFor="let paciente of pacienteList">
+                <td>{{ paciente.tipoDocumento }}</td>
+                <td>{{ paciente.numeroDocumento }}</td>
+                <td>{{ paciente.nombres }}</td>
+                <td>{{ paciente.apellidos }}</td>
+                <td>{{ paciente.fechaNacimiento | date:'dd/MM/yyyy' }}</td>
+                <td>{{ paciente.genero }}</td>
+                <td>{{ paciente.telefono }}</td>
+                <td>{{ paciente.direccion }}</td>
+                <td>
+                    <button class="btn btn-outline-primary" (click)="probarBoton(paciente)">
+                    <i class="fa fa-edit"></i>
+                    &nbsp;Editar
+                    </button>
+                </td>
+            </tr>
+    
+           </tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+</div>
