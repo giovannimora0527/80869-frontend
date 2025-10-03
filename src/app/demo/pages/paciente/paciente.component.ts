@@ -27,8 +27,7 @@ export class PacienteComponent {
     });
   }
 
- probarBoton(paciente: Paciente) {   
+  probarBoton(paciente: Paciente) {
     console.log(paciente);
- }
-
+  }
 }
