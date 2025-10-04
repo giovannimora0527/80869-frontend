@@ -2,14 +2,25 @@ import { Component } from '@angular/core';
 import { UsuarioService } from './service/usuario.service';
 import { Usuario } from './models/usuario';
 import { CommonModule } from '@angular/common';
+import {
+  FormBuilder,
+  FormControl,
+  FormGroup,
+  Validators,
+  AbstractControl,
+  FormsModule,
+  ReactiveFormsModule,
+  ValidationErrors
+} from '@angular/forms';
 
 import Swal from 'sweetalert2';
 // Importa los objetos necesarios de Bootstrap
 import Modal from 'bootstrap/js/dist/modal';
+import { delay, map, Observable, of } from 'rxjs';
 
 @Component({
   selector: 'app-usuario',
-  imports: [CommonModule],
+  imports: [CommonModule, FormsModule, ReactiveFormsModule],
   templateUrl: './usuario.component.html',
   styleUrl: './usuario.component.scss'
 })
@@ -21,8 +32,47 @@ export class UsuarioComponent {
   titleBoton: string = '';
   usuarioSelected: Usuario;
 
-  constructor(private readonly usuarioService: UsuarioService) {
+  /**
+   * Formulario para crear/editar usuario.
+   */
+  form: FormGroup = new FormGroup({
+    username: new FormControl(''),
+    password: new FormControl(''),
+    rol: new FormControl(''),
+    activo: new FormControl('')
+  });
+
+  constructor(
+    private readonly usuarioService: UsuarioService,
+    private readonly formBuilder: FormBuilder
+  ) {
     this.listarUsuarios();
+    this.inicializarFormulario();
+  }
+
+  inicializarFormulario() {
+    this.form = this.formBuilder.group({
+      username: ['', [Validators.required, Validators.minLength(4), Validators.maxLength(12)]],
+      pass: ['', [Validators.required, Validators.minLength(8)], [this.passwordAsyncValidator]],
+      rol: ['', [Validators.required]],
+      activo: ['']
+    });
+  }
+
+  /**
+   * Siempre va igual.
+   */
+  get f(): { [key: string]: AbstractControl } {
+    return this.form.controls;
+  }
+
+  passwordAsyncValidator(control: AbstractControl): Observable<ValidationErrors | null> {
+    const contrasenasProhibidas = ['123456', 'password', 'admin'];
+
+    return of(contrasenasProhibidas.includes(control.value)).pipe(
+      delay(800), // simulamos llamada a servidor
+      map((invalida) => (invalida ? { passwordProhibida: true } : null))
+    );
   }
 
   listarUsuarios() {
@@ -43,15 +93,23 @@ export class UsuarioComponent {
     }
   }
 
-  abrirNuevoUsuario() {
+  limpiarFormulario() {
+    this.form.reset();
+    this.form.markAsPristine();
+    this.form.markAsUntouched();
     this.usuarioSelected = new Usuario();
-    // Cargamos los datos del usuario seleccionado en el formulario
+  }
 
+  abrirNuevoUsuario() {
+    this.usuarioSelected = new Usuario();  
+    this.limpiarFormulario();
     // Dejamos el formulario en blanco
     this.openModal('C');
   }
 
   abrirEditarUsuario(usuario: Usuario) {
+    this.limpiarFormulario();
+    this.usuarioSelected = new Usuario();
     this.usuarioSelected = usuario;
     this.openModal('E');
   }
@@ -69,9 +127,42 @@ export class UsuarioComponent {
   }
 
   guardarUsuario() {
-    Swal.fire("Titulo", "Guardando usuario...", "info");
+    if (this.form.invalid) {
+      Swal.fire("Error", "Por favor, corrija los errores en el formulario.", "error");
+    }
+    
+    if (this.modoFormulario === 'C') {
+      // Crear nuevo usuario
+       this.usuarioService.crearUsuario(this.form.value)
+       .subscribe({
+        next: (data) => {
+          Swal.fire("Éxito", data.mensaje, "success");
+          this.listarUsuarios();
+          this.closeModal();
+        },
+        error: (error) => {
+          Swal.fire("Error", error.error.message, "error");
+        }
+      });
+     
+    } else {
+      // Editar usuario existente
+      const id = this.usuarioSelected.id!;
+      const usuarioActualizado = { ...this.usuarioSelected, ...this.form.value };
+      usuarioActualizado.id = id;
+      console.log(usuarioActualizado);      
+      this.usuarioService.editarUsuario(usuarioActualizado)
+      .subscribe({
+        next: (data) => {
+          Swal.fire("Éxito", data.mensaje, "success");
+          this.listarUsuarios();
+          this.closeModal();
+        },
+        error: (error) => {
+          Swal.fire("Error", error.error.message, "error");
+        }
+      });
+    }
+
   }
-
-
-
 }
