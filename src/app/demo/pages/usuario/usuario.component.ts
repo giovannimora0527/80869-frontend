@@ -37,7 +37,7 @@ export class UsuarioComponent {
    */
   form: FormGroup = new FormGroup({
     username: new FormControl(''),
-    password: new FormControl(''),
+    pass: new FormControl(''),
     rol: new FormControl(''),
     activo: new FormControl('')
   });
@@ -91,6 +91,7 @@ export class UsuarioComponent {
     if (this.modalInstance) {
       this.modalInstance.hide();
     }
+    this.limpiarFormulario();
   }
 
   limpiarFormulario() {
@@ -107,9 +108,7 @@ export class UsuarioComponent {
     this.openModal('C');
   }
 
-  abrirEditarUsuario(usuario: Usuario) {
-    this.limpiarFormulario();
-    this.usuarioSelected = new Usuario();
+  abrirEditarUsuario(usuario: Usuario) {    
     this.usuarioSelected = usuario;
     this.form.get("activo")?.setValue(this.usuarioSelected.activo);
     this.openModal('E');
