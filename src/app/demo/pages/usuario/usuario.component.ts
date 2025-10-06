@@ -111,6 +111,7 @@ export class UsuarioComponent {
     this.limpiarFormulario();
     this.usuarioSelected = new Usuario();
     this.usuarioSelected = usuario;
+    this.form.get("activo")?.setValue(this.usuarioSelected.activo);
     this.openModal('E');
   }
 

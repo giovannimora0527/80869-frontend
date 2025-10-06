@@ -5,4 +5,5 @@ export class Usuario {
   fechaCreacion!: Date;
   activo!: boolean;
   pass!: string;
+  password!: string;
 }

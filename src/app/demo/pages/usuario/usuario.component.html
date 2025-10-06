@@ -93,7 +93,7 @@
                   class="form-control"
                   id="pass"
                   placeholder="Ingrese la contraseña del usuario"
-                  [ngModel]="usuarioSelected ? usuarioSelected.pass : ''"
+                  [ngModel]="usuarioSelected ? usuarioSelected.password : ''"
                 />
                 <div *ngIf="form.get('pass')?.hasError('required') && form.get('pass')?.touched" class="text-danger">
                   La contraseña es requerido.
@@ -102,8 +102,8 @@
               <!--  Rol -->
               <div class="mb-3">
                 <label for="rol" class="form-label">Rol</label>
-                <select formControlName="rol" class="form-control" id="rol" [ngModel]="usuarioSelected ? usuarioSelected.rol : ''">
-                  <option value="" disabled>Seleccione el rol del usuario</option>
+                <select formControlName="rol" class="form-control" id="rol" [ngModel]="usuarioSelected ? usuarioSelected.rol : null">
+                  <option value="null" disabled [selected]="!usuarioSelected || !usuarioSelected.rol">Seleccione el rol del usuario</option>
                   <option value="ADMIN">ADMIN</option>
                   <option value="PACIENTE">PACIENTE</option>
                   <option value="MEDICO">MEDICO</option>
