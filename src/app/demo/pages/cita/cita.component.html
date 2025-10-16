@@ -1,0 +1,77 @@
+<div class="card">
+	<div class="card-body">
+		<div class="d-flex justify-content-between mb-3">
+			<h5>Citas</h5>
+			<button class="btn btn-primary" (click)="abrirCitaModal()">Crear cita</button>
+		</div>
+
+		<table class="table table-striped">
+			<thead>
+				<tr>
+					<th>ID</th>
+					<th>Fecha / Hora</th>
+					<th>Estado</th>
+					<th>Motivo</th>
+					<th>Acciones</th>
+				</tr>
+			</thead>
+			<tbody>
+				<tr *ngFor="let c of citaList">
+					<td>{{ c.id }}</td>
+						<td>{{ c.fechaHora }}</td>
+						<td>{{ c.estado }}</td>
+					<td>{{ c.motivo }}</td>
+					<td>
+						<button class="btn btn-sm btn-secondary" (click)="editarModalCita(c)">Editar</button>
+					</td>
+				</tr>
+			</tbody>
+		</table>
+	</div>
+</div>
+
+<!-- Modal -->
+<div class="modal fade" id="modalCrearCita" tabindex="-1" aria-hidden="true">
+	<div class="modal-dialog">
+		<div class="modal-content">
+			<div class="modal-header">
+				<h5 class="modal-title">{{ titleModal }}</h5>
+				<button type="button" class="btn-close" (click)="closeModal()"></button>
+			</div>
+			<div class="modal-body">
+				<form [formGroup]="form">
+					<div class="mb-3">
+						<label class="form-label">Fecha</label>
+						<input type="date" formControlName="fecha" class="form-control" />
+					</div>
+					<div class="mb-3">
+						<label class="form-label">Hora</label>
+						<input type="time" formControlName="hora" class="form-control" />
+					</div>
+					<div class="mb-3">
+						<label class="form-label">Estado</label>
+						<input type="text" formControlName="estado" class="form-control" />
+					</div>
+					<div class="mb-3">
+						<label class="form-label">Paciente ID</label>
+						<input type="number" formControlName="pacienteId" class="form-control" />
+					</div>
+					<div class="mb-3">
+						<label class="form-label">Médico ID</label>
+						<input type="number" formControlName="medicoId" class="form-control" />
+					</div>
+					<div class="mb-3">
+						<label class="form-label">Motivo</label>
+						<textarea formControlName="motivo" class="form-control"></textarea>
+					</div>
+				</form>
+			</div>
+			<div class="modal-footer">
+				<button type="button" class="btn btn-secondary" (click)="closeModal()">Cancelar</button>
+				<button type="button" class="btn btn-primary" (click)="guardarCita()">{{ titleBoton }}</button>
+			</div>
+		</div>
+	</div>
+</div>
+
+<p>cita works!</p>

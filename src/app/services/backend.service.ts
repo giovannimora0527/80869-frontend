@@ -129,13 +129,7 @@ export class BackendService {
    * @param data Datos a enviar en el cuerpo de la petición
    * @returns Observable<T> respuesta del servidor
    */
-  put<T>(
-    urlApi: string,
-    endpoint: string,
-    service: string,
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    data: any
-  ): Observable<T> {
+  put<T>(urlApi: string, endpoint: string, service: string, data: any): Observable<T> {
     const tokenRecuperado = localStorage.getItem('token') || ''; // Evita `null`
     const headers = new HttpHeaders({
       'Content-Type': 'application/json',

@@ -44,6 +44,47 @@ export const NavigationItems: NavigationItem[] = [
         url: '/inicio/paciente',
         icon: 'feather icon-users',
         classes: 'nav-item'
+      },
+      {
+        id: 'medicamento',
+        title: 'Gestión de Medicamentos',
+        type: 'item',
+        url: '/inicio/medicamento',
+  icon: 'icofont icofont-pill', // Ícono de Icofont para medicamento
+        classes: 'nav-item'
+      }
+      ,
+      {
+        id: 'cita',
+        title: 'Gestión de Citas',
+        type: 'item',
+        url: '/inicio/cita',
+        icon: 'feather icon-calendar',
+        classes: 'nav-item'
+      },
+      {
+        id: 'especializacion',
+        title: 'Gestión de Especializaciones',
+        type: 'item',
+        url: '/inicio/especializacion',
+        icon: 'feather icon-briefcase',
+        classes: 'nav-item'
+      },
+      {
+        id: 'formula-medica',
+        title: 'Gestión de Fórmulas Médicas',
+        type: 'item',
+        url: '/inicio/formula-medica',
+        icon: 'feather icon-file-text',
+        classes: 'nav-item'
+      },
+      {
+        id: 'historia-medica',
+        title: 'Gestión de Historias Médicas',
+        type: 'item',
+        url: '/inicio/historia-medica',
+        icon: 'feather icon-file',
+        classes: 'nav-item'
       }
     ]
   },

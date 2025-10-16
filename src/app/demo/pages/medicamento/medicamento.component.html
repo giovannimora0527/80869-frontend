@@ -1,0 +1,78 @@
+<div class="container">
+  <div class="card">
+    <div class="card-header d-flex justify-content-between align-items-center">
+      <h3><i class="fa fa-pills"></i> Lista de Medicamentos</h3>
+  <button class="btn btn-outline-primary" (click)="abrirMedicamentoModal()">Agregar Medicamento</button>
+    </div>
+    <div class="card-body">
+      <div class="table-responsive">
+        <table class="table table-striped table-hover">
+          <thead>
+            <tr>
+              <th>ID</th>
+              <th>Nombre</th>
+              <th>Descripción</th>
+              <th>Presentación</th>
+              <th>Fecha de compra</th>
+              <th>Fecha de vencimiento</th>
+              <th>Acciones</th>
+            </tr>
+          </thead>
+          <tbody *ngIf="medicamentoList.length > 0">
+            <tr *ngFor="let med of medicamentoList">
+              <td>{{ med.id }}</td>
+              <td>{{ med.nombre }}</td>
+              <td>{{ med.descripcion }}</td>
+              <td>{{ med.presentacion }}</td>
+              <td>{{ med.fechaCompra }}</td>
+              <td>{{ med.fechaVence }}</td>
+              <td>
+                <button class="btn btn-outline-primary" (click)="editarModalMedicamento(med)">
+                  <i class="fa fa-edit"></i> Editar
+                </button>
+              </td>
+            </tr>
+          </tbody>
+          <tbody *ngIf="medicamentoList.length === 0">
+            <tr>
+              <td colspan="7" class="text-center">No hay medicamentos disponibles.</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Modal -->
+<div class="modal fade" id="modalCrearMedicamento" tabindex="-1" aria-labelledby="modalMedicamentoLabel" aria-hidden="true">
+  <div class="modal-dialog modal-lg">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title">{{ titleModal }}</h5>
+        <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+      </div>
+      <div class="modal-body">
+        <form [formGroup]="form">
+          <div class="mb-3">
+            <label for="nombre" class="form-label">Nombre</label>
+            <input type="text" id="nombre" class="form-control" formControlName="nombre" />
+          </div>
+
+          <div class="mb-3">
+            <label for="descripcion" class="form-label">Descripción</label>
+            <input type="text" id="descripcion" class="form-control" formControlName="descripcion" />
+          </div>
+
+          <div class="mb-3">
+            <label for="presentacion" class="form-label">Presentación</label>
+            <input type="text" id="presentacion" class="form-control" formControlName="presentacion" />
+          </div>
+
+          <div class="mb-3">
+            <label for="fechaCompra" class="form-label">Fecha de Compra</label>
+            <input type="date" id="fechaCompra" class="form-control" formControlName="fechaCompra" />
+          </div>
+
+          <div class="mb-3">
+            <label for="fechaVence" class="form-label">Fecha de

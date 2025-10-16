@@ -1,0 +1,53 @@
+<div class="card">
+	<div class="card-body">
+		<div class="d-flex justify-content-between mb-3">
+			<h5>Historias médicas</h5>
+			<button class="btn btn-primary" (click)="abrirCrear()">Crear</button>
+		</div>
+		<table class="table table-striped">
+			<thead>
+				<tr><th>ID</th><th>Paciente</th><th>Fecha</th><th>Descripción</th><th>Acciones</th></tr>
+			</thead>
+			<tbody>
+				<tr *ngFor="let h of lista">
+					<td>{{ h.id }}</td>
+					<td>{{ h.pacienteId }}</td>
+					<td>{{ h.fecha }}</td>
+					<td>{{ h.descripcion }}</td>
+					<td><button class="btn btn-sm btn-secondary" (click)="editar(h)">Editar</button></td>
+				</tr>
+			</tbody>
+		</table>
+	</div>
+</div>
+
+<!-- modal -->
+<div class="modal fade" id="modalHistoriaMedica" tabindex="-1" aria-hidden="true">
+	<div class="modal-dialog">
+		<div class="modal-content">
+			<div class="modal-header"><h5 class="modal-title">{{ titleModal }}</h5><button type="button" class="btn-close" (click)="closeModal()"></button></div>
+			<div class="modal-body">
+				<form [formGroup]="form">
+					<div class="mb-3">
+						<label class="form-label">Paciente ID</label>
+						<input type="number" formControlName="pacienteId" class="form-control" />
+					</div>
+					<div class="mb-3">
+						<label class="form-label">Fecha</label>
+						<input type="date" formControlName="fecha" class="form-control" />
+					</div>
+					<div class="mb-3">
+						<label class="form-label">Descripción</label>
+						<textarea formControlName="descripcion" class="form-control"></textarea>
+					</div>
+				</form>
+			</div>
+			<div class="modal-footer">
+				<button class="btn btn-secondary" (click)="closeModal()">Cancelar</button>
+				<button class="btn btn-primary" (click)="guardar()">{{ titleBoton }}</button>
+			</div>
+		</div>
+	</div>
+</div>
+
+<p>historia-medica works!</p>

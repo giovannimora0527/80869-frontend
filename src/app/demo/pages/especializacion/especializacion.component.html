@@ -1,0 +1,54 @@
+<div class="card">
+	<div class="card-body">
+		<div class="d-flex justify-content-between mb-3">
+			<h5>Especializaciones</h5>
+			<button class="btn btn-primary" (click)="abrirEspecializacionModal()">Crear</button>
+		</div>
+		<table class="table table-striped">
+			<thead>
+				<tr><th>ID</th><th>Nombre</th><th>Código</th><th>Descripción</th><th>Acciones</th></tr>
+			</thead>
+			<tbody>
+				<tr *ngFor="let e of especializacionList">
+					<td>{{ e.id }}</td>
+					<td>{{ e.nombre }}</td>
+					<td>{{ e.codigoEspecializacion }}</td>
+					<td>{{ e.descripcion }}</td>
+					<td><button class="btn btn-sm btn-secondary" (click)="editarModalEspecializacion(e)">Editar</button></td>
+				</tr>
+			</tbody>
+		</table>
+	</div>
+</div>
+
+<!-- modal -->
+<div class="modal fade" id="modalCrearEspecializacion" tabindex="-1" aria-hidden="true">
+	<div class="modal-dialog">
+		<div class="modal-content">
+			<div class="modal-header">
+				<h5 class="modal-title">{{ titleModal }}</h5>
+				<button type="button" class="btn-close" (click)="closeModal()"></button>
+			</div>
+			<div class="modal-body">
+				<form [formGroup]="form">
+					<div class="mb-3">
+						<label class="form-label">Nombre</label>
+						<input type="text" formControlName="nombre" class="form-control" />
+					</div>
+					<div class="mb-3">
+						<label class="form-label">Código</label>
+						<input type="text" formControlName="codigoEspecializacion" class="form-control" />
+					</div>
+					<div class="mb-3">
+						<label class="form-label">Descripción</label>
+						<textarea formControlName="descripcion" class="form-control"></textarea>
+					</div>
+				</form>
+			</div>
+			<div class="modal-footer">
+				<button class="btn btn-secondary" (click)="closeModal()">Cancelar</button>
+				<button class="btn btn-primary" (click)="guardarEspecializacion()">{{ titleBoton }}</button>
+			</div>
+		</div>
+	</div>
+</div>

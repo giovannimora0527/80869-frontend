@@ -1,0 +1,364 @@
+Listado de rutas de carpetas
+El n£mero de serie del volumen es 00000019 BE25:BB31
+C:\USERS\DBAEZ\PICTURES\80869-FRONTEND-CAMBIOS\SRC
+³   favicon.ico
+³   index.html
+³   main.ts
+³   polyfills.ts
+³   styles.scss
+³   test.ts
+³   
+ÃÄÄÄapp
+³   ³   app-config.ts
+³   ³   app-routing.module.ts
+³   ³   app.component.html
+³   ³   app.component.scss
+³   ³   app.component.ts
+³   ³   
+³   ÃÄÄÄdemo
+³   ³   ÃÄÄÄpages
+³   ³   ³   ÃÄÄÄcore-chart
+³   ³   ³   ³   ÀÄÄÄapex-chart
+³   ³   ³   ³           apex-chart.component.html
+³   ³   ³   ³           apex-chart.component.scss
+³   ³   ³   ³           apex-chart.component.ts
+³   ³   ³   ³           
+³   ³   ³   ÃÄÄÄform-elements
+³   ³   ³   ³   ³   form-elements-routing.module.ts
+³   ³   ³   ³   ³   form-elements.module.ts
+³   ³   ³   ³   ³   
+³   ³   ³   ³   ÀÄÄÄbasic-elements
+³   ³   ³   ³           basic-elements.component.html
+³   ³   ³   ³           basic-elements.component.scss
+³   ³   ³   ³           basic-elements.component.ts
+³   ³   ³   ³           
+³   ³   ³   ÃÄÄÄmedico
+³   ³   ³   ³   ³   medico.component.html
+³   ³   ³   ³   ³   medico.component.scss
+³   ³   ³   ³   ³   medico.component.spec.ts
+³   ³   ³   ³   ³   medico.component.ts
+³   ³   ³   ³   ³   
+³   ³   ³   ³   ÃÄÄÄmodels
+³   ³   ³   ³   ³       especializacion.ts
+³   ³   ³   ³   ³       medico-rq.ts
+³   ³   ³   ³   ³       medico.ts
+³   ³   ³   ³   ³       
+³   ³   ³   ³   ÀÄÄÄservice
+³   ³   ³   ³           medico.service.spec.ts
+³   ³   ³   ³           medico.service.ts
+³   ³   ³   ³           
+³   ³   ³   ÃÄÄÄpaciente
+³   ³   ³   ³   ³   paciente.component.html
+³   ³   ³   ³   ³   paciente.component.scss
+³   ³   ³   ³   ³   paciente.component.spec.ts
+³   ³   ³   ³   ³   paciente.component.ts
+³   ³   ³   ³   ³   
+³   ³   ³   ³   ÃÄÄÄmodels
+³   ³   ³   ³   ³       paciente.ts
+³   ³   ³   ³   ³       
+³   ³   ³   ³   ÀÄÄÄservice
+³   ³   ³   ³           paciente.service.spec.ts
+³   ³   ³   ³           paciente.service.ts
+³   ³   ³   ³           
+³   ³   ³   ÃÄÄÄtables
+³   ³   ³   ³   ³   tables-routing.module.ts
+³   ³   ³   ³   ³   tables.module.ts
+³   ³   ³   ³   ³   
+³   ³   ³   ³   ÀÄÄÄtbl-bootstrap
+³   ³   ³   ³           tbl-bootstrap.component.html
+³   ³   ³   ³           tbl-bootstrap.component.scss
+³   ³   ³   ³           tbl-bootstrap.component.ts
+³   ³   ³   ³           
+³   ³   ³   ÀÄÄÄusuario
+³   ³   ³       ³   usuario.component.html
+³   ³   ³       ³   usuario.component.scss
+³   ³   ³       ³   usuario.component.spec.ts
+³   ³   ³       ³   usuario.component.ts
+³   ³   ³       ³   
+³   ³   ³       ÃÄÄÄmodels
+³   ³   ³       ³       respuestars.ts
+³   ³   ³       ³       usuario.ts
+³   ³   ³       ³       
+³   ³   ³       ÀÄÄÄservice
+³   ³   ³               usuario.service.spec.ts
+³   ³   ³               usuario.service.ts
+³   ³   ³               
+³   ³   ÃÄÄÄui-elements
+³   ³   ³   ÀÄÄÄui-basic
+³   ³   ³       ³   ui-basic-routing.module.ts
+³   ³   ³       ³   ui-basic.module.ts
+³   ³   ³       ³   
+³   ³   ³       ÃÄÄÄbasic-badge
+³   ³   ³       ³       basic-badge.component.html
+³   ³   ³       ³       basic-badge.component.scss
+³   ³   ³       ³       basic-badge.component.ts
+³   ³   ³       ³       
+³   ³   ³       ÃÄÄÄbasic-button
+³   ³   ³       ³       basic-button.component.html
+³   ³   ³       ³       basic-button.component.scss
+³   ³   ³       ³       basic-button.component.ts
+³   ³   ³       ³       
+³   ³   ³       ÃÄÄÄbasic-collapse
+³   ³   ³       ³       basic-collapse.component.html
+³   ³   ³       ³       basic-collapse.component.scss
+³   ³   ³       ³       basic-collapse.component.ts
+³   ³   ³       ³       
+³   ³   ³       ÃÄÄÄbasic-tabs-pills
+³   ³   ³       ³       basic-tabs-pills.component.html
+³   ³   ³       ³       basic-tabs-pills.component.scss
+³   ³   ³       ³       basic-tabs-pills.component.ts
+³   ³   ³       ³       
+³   ³   ³       ÃÄÄÄbasic-typography
+³   ³   ³       ³       basic-typography.component.html
+³   ³   ³       ³       basic-typography.component.scss
+³   ³   ³       ³       basic-typography.component.ts
+³   ³   ³       ³       
+³   ³   ³       ÀÄÄÄbreadcrumb-paging
+³   ³   ³               breadcrumb-paging.component.html
+³   ³   ³               breadcrumb-paging.component.scss
+³   ³   ³               breadcrumb-paging.component.ts
+³   ³   ³               
+³   ³   ÀÄÄÄwidget
+³   ³           README.md
+³   ³           
+³   ÃÄÄÄinterceptors
+³   ³       headers.interceptor.ts
+³   ³       
+³   ÃÄÄÄservices
+³   ³   ³   backend.service.ts
+³   ³   ³   
+³   ³   ÀÄÄÄcommon
+³   ³           util-api.service.spec.ts
+³   ³           util-api.service.ts
+³   ³           
+³   ÀÄÄÄtheme
+³       ÃÄÄÄlayout
+³       ³   ÃÄÄÄadmin
+³       ³   ³   ³   admin.component.html
+³       ³   ³   ³   admin.component.scss
+³       ³   ³   ³   admin.component.ts
+³       ³   ³   ³   
+³       ³   ³   ÃÄÄÄconfiguration
+³       ³   ³   ³       configuration.component.html
+³       ³   ³   ³       configuration.component.scss
+³       ³   ³   ³       configuration.component.ts
+³       ³   ³   ³       
+³       ³   ³   ÃÄÄÄnav-bar
+³       ³   ³   ³   ³   nav-bar.component.html
+³       ³   ³   ³   ³   nav-bar.component.scss
+³       ³   ³   ³   ³   nav-bar.component.ts
+³       ³   ³   ³   ³   
+³       ³   ³   ³   ÃÄÄÄnav-left
+³       ³   ³   ³   ³   ³   nav-left.component.html
+³       ³   ³   ³   ³   ³   nav-left.component.scss
+³       ³   ³   ³   ³   ³   nav-left.component.ts
+³       ³   ³   ³   ³   ³   
+³       ³   ³   ³   ³   ÀÄÄÄnav-search
+³       ³   ³   ³   ³           nav-search.component.html
+³       ³   ³   ³   ³           nav-search.component.scss
+³       ³   ³   ³   ³           nav-search.component.ts
+³       ³   ³   ³   ³           
+³       ³   ³   ³   ÀÄÄÄnav-right
+³       ³   ³   ³           nav-right.component.html
+³       ³   ³   ³           nav-right.component.scss
+³       ³   ³   ³           nav-right.component.ts
+³       ³   ³   ³           
+³       ³   ³   ÀÄÄÄnavigation
+³       ³   ³       ³   navigation.component.html
+³       ³   ³       ³   navigation.component.scss
+³       ³   ³       ³   navigation.component.ts
+³       ³   ³       ³   navigation.ts
+³       ³   ³       ³   
+³       ³   ³       ÃÄÄÄnav-content
+³       ³   ³       ³   ³   nav-content.component.html
+³       ³   ³       ³   ³   nav-content.component.scss
+³       ³   ³       ³   ³   nav-content.component.ts
+³       ³   ³       ³   ³   
+³       ³   ³       ³   ÃÄÄÄnav-collapse
+³       ³   ³       ³   ³       nav-collapse.component.html
+³       ³   ³       ³   ³       nav-collapse.component.scss
+³       ³   ³       ³   ³       nav-collapse.component.ts
+³       ³   ³       ³   ³       
+³       ³   ³       ³   ÃÄÄÄnav-group
+³       ³   ³       ³   ³       nav-group.component.html
+³       ³   ³       ³   ³       nav-group.component.scss
+³       ³   ³       ³   ³       nav-group.component.ts
+³       ³   ³       ³   ³       
+³       ³   ³       ³   ÀÄÄÄnav-item
+³       ³   ³       ³           nav-item.component.html
+³       ³   ³       ³           nav-item.component.scss
+³       ³   ³       ³           nav-item.component.ts
+³       ³   ³       ³           
+³       ³   ³       ÀÄÄÄnav-logo
+³       ³   ³               nav-logo.component.html
+³       ³   ³               nav-logo.component.scss
+³       ³   ³               nav-logo.component.ts
+³       ³   ³               
+³       ³   ÀÄÄÄguest
+³       ³           guest.component.html
+³       ³           guest.component.scss
+³       ³           guest.component.ts
+³       ³           
+³       ÀÄÄÄshared
+³           ³   shared.module.ts
+³           ³   
+³           ÃÄÄÄcomponents
+³           ³   ÃÄÄÄbreadcrumbs
+³           ³   ³       breadcrumbs.component.html
+³           ³   ³       breadcrumbs.component.scss
+³           ³   ³       breadcrumbs.component.ts
+³           ³   ³       
+³           ³   ÃÄÄÄcard
+³           ³   ³       card.component.html
+³           ³   ³       card.component.scss
+³           ³   ³       card.component.ts
+³           ³   ³       
+³           ³   ÃÄÄÄfull-screen
+³           ³   ³       toggle-full-screen.ts
+³           ³   ³       
+³           ³   ÀÄÄÄspinner
+³           ³       ³   spinkits.ts
+³           ³       ³   spinner.component.html
+³           ³       ³   spinner.component.scss
+³           ³       ³   spinner.component.ts
+³           ³       ³   
+³           ³       ÀÄÄÄspinkit-css
+³           ³               sk-line-material.scss
+³           ³               
+³           ÃÄÄÄdirective
+³           ³       README.md
+³           ³       
+³           ÃÄÄÄfilters
+³           ³       README.md
+³           ³       
+³           ÃÄÄÄhelpers
+³           ³       README.md
+³           ³       
+³           ÀÄÄÄservice
+³                   README.md
+³                   
+ÃÄÄÄassets
+³   ÃÄÄÄcharts
+³   ³   ÀÄÄÄamchart
+³   ³       ³   amcharts.js
+³   ³       ³   ammap.min.js
+³   ³       ³   gauge.js
+³   ³       ³   light.js
+³   ³       ³   pie.min.js
+³   ³       ³   radar.js
+³   ³       ³   serial.js
+³   ³       ³   usaLow.js
+³   ³       ³   worldLow.js
+³   ³       ³   
+³   ³       ÀÄÄÄimages
+³   ³               dragIconRoundBig.svg
+³   ³               lens.svg
+³   ³               
+³   ÃÄÄÄicon
+³   ³   ÀÄÄÄicofont
+³   ³       ÃÄÄÄcss
+³   ³       ³       icofont.scss
+³   ³       ³       
+³   ³       ÀÄÄÄfonts
+³   ³               icofont.eot
+³   ³               icofont.svg
+³   ³               icofont.ttf
+³   ³               icofont.woff
+³   ³               
+³   ÀÄÄÄimages
+³       ³   logo-dark.png
+³       ³   logo-thumb.png
+³       ³   logo.png
+³       ³   sidebar.png
+³       ³   
+³       ÀÄÄÄuser
+³               avatar-1.jpg
+³               avatar-2.jpg
+³               avatar-3.jpg
+³               avatar-4.jpg
+³               avatar-5.jpg
+³               user-1.png
+³               user-2.png
+³               
+ÃÄÄÄenvironments
+³       environment.prod.ts
+³       environment.ts
+³       
+ÀÄÄÄscss
+    ³   _custom.scss
+    ³   _general.scss
+    ³   _generic.scss
+    ³   _variables.scss
+    ³   
+    ÃÄÄÄfonts
+    ³   ÃÄÄÄfeather
+    ³   ³   ³   iconfont.scss
+    ³   ³   ³   
+    ³   ³   ÀÄÄÄfonts
+    ³   ³           feather.eot
+    ³   ³           feather.svg
+    ³   ³           feather.ttf
+    ³   ³           feather.woff
+    ³   ³           
+    ³   ÀÄÄÄfontawesome
+    ³       ÃÄÄÄscss
+    ³       ³       brands.scss
+    ³       ³       fontawesome.scss
+    ³       ³       regular.scss
+    ³       ³       solid.scss
+    ³       ³       v4-shims.scss
+    ³       ³       _animated.scss
+    ³       ³       _bordered-pulled.scss
+    ³       ³       _core.scss
+    ³       ³       _fixed-width.scss
+    ³       ³       _icons.scss
+    ³       ³       _larger.scss
+    ³       ³       _list.scss
+    ³       ³       _mixins.scss
+    ³       ³       _rotated-flipped.scss
+    ³       ³       _screen-reader.scss
+    ³       ³       _shims.scss
+    ³       ³       _stacked.scss
+    ³       ³       _variables.scss
+    ³       ³       
+    ³       ÀÄÄÄwebfonts
+    ³               fa-brands-400.eot
+    ³               fa-brands-400.svg
+    ³               fa-brands-400.ttf
+    ³               fa-brands-400.woff
+    ³               fa-brands-400.woff2
+    ³               fa-regular-400.eot
+    ³               fa-regular-400.svg
+    ³               fa-regular-400.ttf
+    ³               fa-regular-400.woff
+    ³               fa-regular-400.woff2
+    ³               fa-solid-900.eot
+    ³               fa-solid-900.svg
+    ³               fa-solid-900.ttf
+    ³               fa-solid-900.woff
+    ³               fa-solid-900.woff2
+    ³               
+    ÃÄÄÄmenu
+    ³       _menu-lite.scss
+    ³       
+    ÃÄÄÄmixins
+    ³       _buttons.scss
+    ³       _function.scss
+    ³       
+    ÃÄÄÄplugins
+    ³       _angular-morris-js.scss
+    ³       _plugins.scss
+    ³       
+    ÀÄÄÄtheme-elements
+            _authentication.scss
+            _badge.scss
+            _breadcrumb-pagination.scss
+            _button.scss
+            _data-tables.scss
+            _form.scss
+            _labels-badges.scss
+            _nav.scss
+            _progress.scss
+            _radiobox-checkbox.scss
+            _theme-elements.scss
+            
