@@ -13,6 +13,8 @@ import {
   ValidationErrors
 } from '@angular/forms';
 
+import { NgxSpinnerModule, NgxSpinnerService } from 'ngx-spinner';
+
 import Swal from 'sweetalert2';
 // Importa los objetos necesarios de Bootstrap
 import Modal from 'bootstrap/js/dist/modal';
@@ -20,7 +22,7 @@ import { delay, map, Observable, of } from 'rxjs';
 
 @Component({
   selector: 'app-usuario',
-  imports: [CommonModule, FormsModule, ReactiveFormsModule],
+  imports: [CommonModule, FormsModule, ReactiveFormsModule, NgxSpinnerModule],
   templateUrl: './usuario.component.html',
   styleUrl: './usuario.component.scss'
 })
@@ -31,6 +33,7 @@ export class UsuarioComponent {
   titleModal: string = '';
   titleBoton: string = '';
   usuarioSelected: Usuario;
+  msjSpinner: string = "";
 
   /**
    * Formulario para crear/editar usuario.
@@ -44,7 +47,8 @@ export class UsuarioComponent {
 
   constructor(
     private readonly usuarioService: UsuarioService,
-    private readonly formBuilder: FormBuilder
+    private readonly formBuilder: FormBuilder,
+    private readonly spinner: NgxSpinnerService
   ) {
     this.listarUsuarios();
     this.inicializarFormulario();
@@ -76,13 +80,18 @@ export class UsuarioComponent {
   }
 
   listarUsuarios() {
+    this.msjSpinner = "Cargando usuarios ....";
+    this.spinner.show();
     this.usuarioService.listarUsuarios().subscribe({
       next: (data) => {
+        this.spinner.hide();
         this.usuarios = data;
         console.log(this.usuarios);
       },
       error: (error) => {
+        this.spinner.hide();
         console.error('Error fetching users:', error);
+        Swal.fire('Error', "No se pudieron cargar los usuarios", 'error');
       }
     });
   }
@@ -102,15 +111,15 @@ export class UsuarioComponent {
   }
 
   abrirNuevoUsuario() {
-    this.usuarioSelected = new Usuario();  
+    this.usuarioSelected = new Usuario();
     this.limpiarFormulario();
     // Dejamos el formulario en blanco
     this.openModal('C');
   }
 
-  abrirEditarUsuario(usuario: Usuario) {    
+  abrirEditarUsuario(usuario: Usuario) {
     this.usuarioSelected = usuario;
-    this.form.get("activo")?.setValue(this.usuarioSelected.activo);
+    this.form.get('activo')?.setValue(this.usuarioSelected.activo);
     this.openModal('E');
   }
 
@@ -127,42 +136,41 @@ export class UsuarioComponent {
   }
 
   guardarUsuario() {
+    this.msjSpinner = this.modoFormulario === 'C' ? "Creando usuario ..." 
+    : "Actualizando usuario ...";
+    this.spinner.show();
     if (this.form.invalid) {
-      Swal.fire("Error", "Por favor, corrija los errores en el formulario.", "error");
+      Swal.fire('Error', 'Por favor, corrija los errores en el formulario.', 'error');
     }
-    
+
     if (this.modoFormulario === 'C') {
       // Crear nuevo usuario
-       this.usuarioService.crearUsuario(this.form.value)
-       .subscribe({
+      this.usuarioService.crearUsuario(this.form.value).subscribe({
         next: (data) => {
-          Swal.fire("Éxito", data.mensaje, "success");
+          Swal.fire('Éxito', data.mensaje, 'success');
           this.listarUsuarios();
           this.closeModal();
         },
         error: (error) => {
-          Swal.fire("Error", error.error.message, "error");
+          Swal.fire('Error', error.error.message, 'error');
         }
       });
-     
     } else {
       // Editar usuario existente
       const id = this.usuarioSelected.id!;
       const usuarioActualizado = { ...this.usuarioSelected, ...this.form.value };
       usuarioActualizado.id = id;
-      console.log(usuarioActualizado);      
-      this.usuarioService.editarUsuario(usuarioActualizado)
-      .subscribe({
+      console.log(usuarioActualizado);
+      this.usuarioService.editarUsuario(usuarioActualizado).subscribe({
         next: (data) => {
-          Swal.fire("Éxito", data.mensaje, "success");
+          Swal.fire('Éxito', data.mensaje, 'success');
           this.listarUsuarios();
           this.closeModal();
         },
         error: (error) => {
-          Swal.fire("Error", error.error.message, "error");
+          Swal.fire('Error', error.error.message, 'error');
         }
       });
     }
-
   }
 }
