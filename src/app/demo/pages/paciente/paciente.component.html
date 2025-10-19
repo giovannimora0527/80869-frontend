@@ -1,51 +1,156 @@
-<div class="container">
+<ngx-spinner type="pacman" size="medium" color="#fff">
+  <p style="color: white">{{ msjSpinner }}</p>
+</ngx-spinner>
+
+<div class="container mt-4">
   <div class="card">
-    <div class="card-header">
-      <div class="row">
-        <div class="col d-flex">
-          <h3 class="mb-0">
-            <i class="fa fa-users"></i>
-            Mis Pacientes
-          </h3>
-        </div>
+    <div class="card-header d-flex justify-content-between align-items-center">
+      <h3 class="mb-0"><i class="fa fa-users"></i> Gestión de Pacientes</h3>
+      <div>
+        <button class="btn btn-outline-primary" (click)="abrirPacienteModal()">Agregar Paciente</button>
       </div>
     </div>
+
     <div class="card-body">
       <div class="table-responsive">
         <table class="table table-striped table-hover">
           <thead>
             <tr>
-              <td>Tipo de documento</td>
-              <td>#. Documento</td>
-              <td>Nombres</td>
-              <td>Apellidos</td>
-              <td>Fecha de nacimiento</td>
-              <td>Género</td>
-              <td>Teléfono</td>
-              <td>Dirección</td>
-              <td>Acciones</td>
+              <th>Tipo documento
+                <input class="form-control form-control-sm mt-1" [(ngModel)]="filtros.tipoDocumento" placeholder="Filtro" />
+              </th>
+              <th># Documento
+                <input class="form-control form-control-sm mt-1" [(ngModel)]="filtros.numeroDocumento" placeholder="Filtro" />
+              </th>
+              <th>Nombres
+                <input class="form-control form-control-sm mt-1" [(ngModel)]="filtros.nombres" placeholder="Filtro" />
+              </th>
+              <th>Apellidos
+                <input class="form-control form-control-sm mt-1" [(ngModel)]="filtros.apellidos" placeholder="Filtro" />
+              </th>
+              <th>Fecha Nac.
+                <input class="form-control form-control-sm mt-1" [(ngModel)]="filtros.fechaNacimiento" placeholder="Filtro" />
+              </th>
+              <th>Género
+                <input class="form-control form-control-sm mt-1" [(ngModel)]="filtros.genero" placeholder="Filtro" />
+              </th>
+              <th>Teléfono
+                <input class="form-control form-control-sm mt-1" [(ngModel)]="filtros.telefono" placeholder="Filtro" />
+              </th>
+              <th>Dirección
+                <input class="form-control form-control-sm mt-1" [(ngModel)]="filtros.direccion" placeholder="Filtro" />
+              </th>
+              <th>Acciones</th>
             </tr>
           </thead>
-           <tbody *ngIf="pacienteList.length > 0">
-            <tr *ngFor="let paciente of pacienteList">
-                <td>{{ paciente.tipoDocumento }}</td>
-                <td>{{ paciente.numeroDocumento }}</td>
-                <td>{{ paciente.nombres }}</td>
-                <td>{{ paciente.apellidos }}</td>
-                <td>{{ paciente.fechaNacimiento | date:'dd/MM/yyyy' }}</td>
-                <td>{{ paciente.genero }}</td>
-                <td>{{ paciente.telefono }}</td>
-                <td>{{ paciente.direccion }}</td>
-                <td>
-                    <button class="btn btn-outline-primary" (click)="probarBoton(paciente)">
-                    <i class="fa fa-edit"></i>
-                    &nbsp;Editar
-                    </button>
-                </td>
+          <tbody *ngIf="pacienteList.length > 0">
+            <tr *ngFor="let paciente of pacientesFiltrados">
+              <td>{{ paciente.tipoDocumento }}</td>
+              <td>{{ paciente.numeroDocumento }}</td>
+              <td>{{ paciente.nombres }}</td>
+              <td>{{ paciente.apellidos }}</td>
+              <td>{{ paciente.fechaNacimiento | date:'dd/MM/yyyy' }}</td>
+              <td>{{ paciente.genero }}</td>
+              <td>{{ paciente.telefono }}</td>
+              <td>{{ paciente.direccion }}</td>
+              <td>
+                <button class="btn btn-outline-primary btn-sm" (click)="editarModalPaciente(paciente)">
+                  <i class="fa fa-edit"></i>&nbsp;Editar
+                </button>
+              </td>
             </tr>
-    
-           </tbody>
+          </tbody>
+          <tbody *ngIf="pacienteList.length === 0">
+            <tr>
+              <td colspan="9" class="text-center">No hay pacientes disponibles.</td>
+            </tr>
+          </tbody>
         </table>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Modal -->
+<div class="modal fade" id="modalCrearPaciente" tabindex="-1" aria-labelledby="modalCrearPacienteLabel" aria-hidden="true">
+  <div class="modal-dialog modal-lg">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title" id="modalCrearPacienteLabel">{{ titleModal }}</h5>
+        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Cerrar"></button>
+      </div>
+      <div class="modal-body">
+        <form [formGroup]="form">
+          <div class="row">
+            <div class="col-md-6">
+              <div class="mb-3">
+                <label class="form-label">Tipo de documento</label>
+                <select formControlName="tipoDocumento" class="form-control">
+                  <option value="">Seleccione tipo de documento</option>
+                  <option value="CC">Cédula</option>
+                  <option value="PA">Pasaporte</option>
+                  <option value="CE">Cédula Extranjería</option>
+                </select>
+                <div *ngIf="f.tipoDocumento?.hasError('required') && f.tipoDocumento?.touched" class="text-danger">Tipo de documento es requerido</div>
+              </div>
+
+              <div class="mb-3">
+                <label class="form-label"># Documento</label>
+                <input type="text" formControlName="numeroDocumento" class="form-control" />
+                <div *ngIf="f.numeroDocumento?.hasError('required') && f.numeroDocumento?.touched" class="text-danger">Número de documento es requerido</div>
+              </div>
+
+              <div class="mb-3">
+                <label class="form-label">Nombres</label>
+                <input type="text" formControlName="nombres" class="form-control" />
+                <div *ngIf="f.nombres?.hasError('required') && f.nombres?.touched" class="text-danger">Nombres son requeridos</div>
+              </div>
+            </div>
+
+            <div class="col-md-6">
+              <div class="mb-3">
+                <label class="form-label">Apellidos</label>
+                <input type="text" formControlName="apellidos" class="form-control" />
+                <div *ngIf="f.apellidos?.hasError('required') && f.apellidos?.touched" class="text-danger">Apellidos son requeridos</div>
+              </div>
+
+              <div class="mb-3">
+                <label class="form-label">Fecha de nacimiento</label>
+                <input type="date" formControlName="fechaNacimiento" class="form-control" />
+                <div *ngIf="f.fechaNacimiento?.hasError('required') && f.fechaNacimiento?.touched" class="text-danger">Fecha de nacimiento es requerida</div>
+              </div>
+
+              <div class="mb-3">
+                <label class="form-label">Género</label>
+                <select formControlName="genero" class="form-control">
+                  <option value="">Seleccione Género</option>
+                  <option value="M">Masculino</option>
+                  <option value="F">Femenino</option>
+                </select>
+                <div *ngIf="f.genero?.hasError('required') && f.genero?.touched" class="text-danger">Género es requerido</div>
+              </div>
+            </div>
+          </div>
+
+          <div class="row">
+            <div class="col-md-6">
+              <div class="mb-3">
+                <label class="form-label">Teléfono</label>
+                <input type="text" formControlName="telefono" class="form-control" />
+              </div>
+            </div>
+            <div class="col-md-6">
+              <div class="mb-3">
+                <label class="form-label">Dirección</label>
+                <input type="text" formControlName="direccion" class="form-control" />
+              </div>
+            </div>
+          </div>
+        </form>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
+        <button type="button" class="btn btn-primary" (click)="guardarPaciente()">{{ titleBoton }}</button>
       </div>
     </div>
   </div>
