@@ -1,12 +1,16 @@
+<ngx-spinner type="pacman" size="medium" color="#fff">
+  <p style="color: white">{{ msjSpinner }}</p>
+</ngx-spinner>
 <div class="container">
   <div class="card">
     <div class="card-header">
       <div class="row">
-        <div class="col d-flex">
+        <div class="col d-flex align-items-center justify-content-between">
           <h3 class="mb-0">
             <i class="fa fa-users"></i>
             Mis Pacientes
           </h3>
+          <button class="btn btn-outline-primary ms-3" (click)="abrirPacienteModal()">Agregar Paciente</button>
         </div>
       </div>
     </div>
@@ -26,26 +30,148 @@
               <td>Acciones</td>
             </tr>
           </thead>
-           <tbody *ngIf="pacienteList.length > 0">
+          <tbody *ngIf="pacienteList.length > 0">
             <tr *ngFor="let paciente of pacienteList">
-                <td>{{ paciente.tipoDocumento }}</td>
-                <td>{{ paciente.numeroDocumento }}</td>
-                <td>{{ paciente.nombres }}</td>
-                <td>{{ paciente.apellidos }}</td>
-                <td>{{ paciente.fechaNacimiento | date:'dd/MM/yyyy' }}</td>
-                <td>{{ paciente.genero }}</td>
-                <td>{{ paciente.telefono }}</td>
-                <td>{{ paciente.direccion }}</td>
-                <td>
-                    <button class="btn btn-outline-primary" (click)="probarBoton(paciente)">
-                    <i class="fa fa-edit"></i>
-                    &nbsp;Editar
-                    </button>
-                </td>
+              <td>{{ paciente.tipoDocumento }}</td>
+              <td>{{ paciente.numeroDocumento }}</td>
+              <td>{{ paciente.nombres }}</td>
+              <td>{{ paciente.apellidos }}</td>
+              <td>{{ paciente.fechaNacimiento | date:'dd/MM/yyyy' }}</td>
+              <td>{{ paciente.genero }}</td>
+              <td>{{ paciente.telefono }}</td>
+              <td>{{ paciente.direccion }}</td>
+              <td>
+                <button class="btn btn-outline-primary" (click)="editarModalPaciente(paciente)">
+                  <i class="fa fa-edit"></i>
+                  &nbsp;Editar
+                </button>
+              </td>
             </tr>
-    
-           </tbody>
+          </tbody>
         </table>
+      </div>
+    </div>
+  </div>
+</div>
+
+
+<!-- Modal -->
+<div class="modal fade" id="modalCrearPaciente" tabindex="-1" aria-labelledby="modalCrearPacienteLabel"
+  aria-hidden="true">
+  <div class="modal-dialog modal-lg">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title" id="modalCrearPacienteLabel">{{ titleModal }}</h5>
+        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Cerrar"></button>
+      </div>
+      <div class="modal-body">
+        <div class="row">
+          <div class="col">
+            <form [formGroup]="form">
+              <!-- Tipo de documento -->
+              <div class="mb-3">
+                <label for="tipoDocumento" class="form-label">Tipo de documento</label>
+                <select formControlName="tipoDocumento" class="form-control" id="tipoDocumento"
+                  [ngModel]="pacienteSelected ? pacienteSelected.tipoDocumento : ''">
+                  <option value="" disabled selected>Seleccione el tipo de documento</option>
+                  <option value="CC">Cédula de Ciudadanía</option>
+                  <option value="PA">Pasaporte</option>
+                  <option value="CE">Cédula de Extranjería</option>
+                </select>
+                <div *ngIf="form.get('tipoDocumento')?.hasError('required') && form.get('tipoDocumento')?.touched"
+                  class="text-danger">
+                  El tipo de documento es requerido
+                </div>
+              </div>
+              <!--  Numero de documento -->
+              <div class="mb-3">
+                <label for="numeroDocumento" class="form-label">#. Documento</label>
+                <input type="text" formControlName="numeroDocumento" class="form-control" id="numeroDocumento"
+                  placeholder="Ingrese el número de documento de identidad"
+                  [ngModel]="pacienteSelected ? pacienteSelected.numeroDocumento : ''" />
+                <div *ngIf="form.get('numeroDocumento')?.hasError('required') && form.get('numeroDocumento')?.touched"
+                  class="text-danger">
+                  El número de documento es requerido.
+                </div>
+              </div>
+
+              <!--  Nombres del Paciente -->
+              <div class="mb-3">
+                <label for="nombres" class="form-label">Nombres del Paciente</label>
+                <input type="text" formControlName="nombres" class="form-control" id="nombres"
+                  placeholder="Ingrese el nombre completo del paciente"
+                  [ngModel]="pacienteSelected ? pacienteSelected.nombres : ''" />
+                <div *ngIf="form.get('nombres')?.hasError('required') && form.get('nombres')?.touched"
+                  class="text-danger">
+                  El nombre del paciente es requerido.
+                </div>
+                <div *ngIf="form.get('nombres')?.hasError('minLength') && form.get('nombres')?.touched"
+                  class="text-danger">
+                  El nombre del paciente debe tener al menos 3 caracteres.
+                </div>
+              </div>
+
+              <!--  Apellidos del Paciente -->
+              <div class="mb-3">
+                <label for="apellidos" class="form-label">Apellidos del Paciente</label>
+                <input type="text" formControlName="apellidos" class="form-control" id="apellidos"
+                  placeholder="Ingrese los apellidos del Paciente"
+                  [ngModel]="pacienteSelected ? pacienteSelected.apellidos : ''" />
+                <div *ngIf="form.get('apellidos')?.hasError('required') && form.get('apellidos')?.touched"
+                  class="text-danger">
+                  Los apellidos del paciente son requeridos.
+                </div>
+                <div *ngIf="form.get('apellidos')?.hasError('minLength') && form.get('apellidos')?.touched"
+                  class="text-danger">
+                  Los apellidos del paciente debe tener al menos 3 caracteres.
+                </div>
+              </div>
+
+              <!--  Dirección del paciente -->
+              <div class="mb-3">
+                <label for="direccion" class="form-label">Direccion</label>
+                <input type="text" formControlName="direccion" class="form-control" id="direccion"
+                  placeholder="Ingrese la direccion del paciente"
+                  [ngModel]="pacienteSelected ? pacienteSelected.direccion : ''" />
+                <div *ngIf="form.get('direccion')?.hasError('direccion') && form.get('direccion')?.touched"
+                  class="text-danger">
+                  La dirección del paciente es requerida.
+                </div>
+              </div>
+
+              <!--  Telefono del paciente -->
+              <div class="mb-3">
+                <label for="telefono" class="form-label">Teléfono</label>
+                <input type="text" formControlName="telefono" class="form-control" id="telefono"
+                  placeholder="Ingrese el telefono del paciente"
+                  [ngModel]="pacienteSelected ? pacienteSelected.telefono : ''" />
+                <div *ngIf="form.get('telefono')?.hasError('telefono') && form.get('telefono')?.touched"
+                  class="text-danger">
+                  El teléfono del paciente es requerido.
+                </div>
+              </div>
+
+              <!-- Genero -->
+              <div class="mb-3">
+                <label for="genero" class="form-label">Género</label>
+                <select formControlName="genero" class="form-control" id="genero"
+                  [ngModel]="pacienteSelected ? pacienteSelected.genero : ''">
+                  <option value="" disabled selected>Seleccione genero</option>
+                  <option value="M">Masculino</option>
+                  <option value="F">Femenino</option>
+                </select>
+                <div *ngIf="form.get('especializacion')?.hasError('required') && form.get('especializacion')?.touched"
+                  class="text-danger">
+                  El género es requerido
+                </div>
+              </div>
+            </form>
+          </div>
+        </div>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
+        <button type="button" class="btn btn-primary" (click)="guardarPaciente()">{{ titleBoton }}</button>
       </div>
     </div>
   </div>
