@@ -77,6 +77,14 @@ export const NavigationItems: NavigationItem[] = [
         url: '/inicio/historia-medica',
         icon: 'feather icon-file-text',
         classes: 'nav-item'
+      },
+      {
+        id: 'recetas',
+        title: 'Gestión de Recetas',
+        type: 'item',
+        url: '/inicio/recetas',
+        icon: 'feather icon-clipboard',
+        classes: 'nav-item'
       }
     ]
   },
