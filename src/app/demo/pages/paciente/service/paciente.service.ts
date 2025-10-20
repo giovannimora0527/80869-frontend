@@ -16,4 +16,12 @@ export class PacienteService {
   listarPacientes(): Observable<Paciente[]> {
     return this.backendService.get(this.apiUrl, this.endpoint, 'listar');
   }
+
+  crearPaciente(paciente: Paciente): Observable<any> {
+    return this.backendService.post(this.apiUrl, this.endpoint, 'guardar', paciente);
+  }
+
+  actualizarPaciente(paciente: Paciente): Observable<any> {
+    return this.backendService.post(this.apiUrl, this.endpoint, 'actualizar', paciente);
+  }
 }
