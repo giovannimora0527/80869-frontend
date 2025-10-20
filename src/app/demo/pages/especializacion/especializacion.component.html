@@ -1,1 +1,43 @@
-<p>especializacion works!</p>
+<div class="container">
+  <div class="card">
+    <div class="card-header">
+      <div class="row">
+        <div class="col d-flex">
+          <h3 class="mb-0">
+            <i class="fa fa-users"></i>
+            Especialidades
+          </h3>
+        </div>
+      </div>
+    </div>
+    <div class="card-body">
+      <div class="table-responsive">
+        <table class="table table-striped table-hover">
+          <thead>
+            <tr>
+              <td>Id</td>
+              <td>Nombre</td>
+              <td>Descripción</td>
+              <td>Código de especialización</td>
+            </tr>
+          </thead>
+          <tbody *ngIf="especialidadList.length > 0">
+            <tr *ngFor="let especialidad of especialidadList">
+                <td>{{ especialidad.id }}</td>
+                <td>{{ especialidad.nombre }}</td>
+                <td>{{ especialidad.descripcion }}</td>
+                <td>{{ especialidad.codigoEspecializacion }}</td>
+                <td>
+                    <button class="btn btn-outline-primary" (click)="probarBoton(especialidad)">
+                    <i class="fa fa-edit"></i>
+                    &nbsp;Editar
+                    </button>
+                </td>
+            </tr>
+    
+           </tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+</div>
