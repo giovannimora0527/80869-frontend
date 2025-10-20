@@ -1,0 +1,118 @@
+<div class="container">
+  <div class="card">
+    <div class="card-header">
+      <div class="row">
+        <div class="col d-flex align-items-center justify-content-between">
+          <h3 class="mb-0">
+            <i class="fa fa-prescription-bottle-alt"></i>
+            Gestión de Recetas
+          </h3>
+          <!-- Llama a la función abrirRecetaModal() -->
+          <button class="btn btn-outline-primary ms-3" (click)="abrirRecetaModal()">Crear Receta</button>
+        </div>
+      </div>
+    </div>
+    <div class="card-body">
+      <!-- Indicador de Carga (Spinner) -->
+      <div *ngIf="isLoading" class="text-center p-5">
+        <div class="spinner-border text-success" role="status">
+          <span class="sr-only">Cargando...</span>
+        </div>
+        <p class="mt-2">Cargando recetas...</p>
+      </div>
+
+      <div *ngIf="!isLoading" class="table-responsive">
+        <table class="table table-striped table-hover">
+          <thead>
+            <tr>
+              <th>Id</th>
+              <th>Cita ID</th>
+              <th>Paciente</th>
+              <th>Medicamento</th>
+              <th>Dosis</th>
+              <th>Indicaciones</th>
+              <th>Acciones</th>
+            </tr>
+          </thead>
+          <!-- Usamos recetaList para iterar -->
+          <tbody *ngIf="recetaList && recetaList.length > 0">
+            <tr *ngFor="let receta of recetaList">
+              <td>{{ receta.id }}</td>
+              <!-- Asumiendo que la cita tiene la propiedad id y el paciente (para mostrar quién la recibió) -->
+      
+          
+              <!-- Asumiendo que medicamento tiene la propiedad nombre y presentación -->
+           
+              <td>{{ receta.dosis }}</td>
+              <td>{{ receta.indicaciones }}</td>
+              <td>
+                <!-- Llama a la función editarModalReceta(receta) -->
+                <button class="btn btn-outline-primary" (click)="editarModalReceta(receta)">
+                  <i class="fa fa-edit"></i>
+                  &nbsp;Editar
+                </button>
+              </td>
+            </tr>
+          </tbody>
+          <tbody *ngIf="!recetaList || recetaList.length === 0">
+            <tr>
+              <td colspan="7" class="text-center">No hay recetas registradas.</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Modal -->
+<div class="modal fade" id="modalRecetas" tabindex="-1" aria-labelledby="modalRecetasLabel" aria-hidden="true">
+  <div class="modal-dialog modal-lg">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title" id="modalRecetasLabel">{{ titleModal }}</h5>
+        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Cerrar" (click)="closeModal()"></button>
+      </div>
+      <div class="modal-body">
+        <div class="row">
+          <div class="col">
+            <!-- Formulario enlazado al formGroup de receta.component.ts -->
+            <form [formGroup]="form">
+              <!-- Cita (Select) -->
+              <div class="mb-3">
+                <label for="citaId" class="form-label">Cita Asociada</label>
+          
+                  <option [ngValue]="null" disabled selected>Seleccione la cita</option>
+                  <!-- Aquí iría el *ngFor para listar citas si tuvieras la lista -->
+                  <option value="1">Cita ID 1 (Paciente X)</option>
+                  <option value="2">Cita ID 2 (Paciente Y)</option>
+     
+                <div *ngIf="f['medicamento'].errors?.['required'] && f['medicamento'].touched" class="text-danger">
+                  El medicamento es requerido.
+                </div>
+              </div>
+              <!-- Dosis -->
+              <div class="mb-3">
+                <label for="dosis" class="form-label">Dosis / Posología</label>
+                <input type="text" formControlName="dosis" class="form-control" id="dosis" placeholder="Ej: 1 tableta cada 8 horas por 7 días" [ngModel]="recetaSelected ? recetaSelected.dosis : ''" />
+                <div *ngIf="f['dosis'].errors?.['required'] && f['dosis'].touched" class="text-danger">
+                  La dosis es requerida.
+                </div>
+              </div>
+              <!-- Indicaciones -->
+              <div class="mb-3">
+                <label for="indicaciones" class="form-label">Indicaciones Adicionales</label>
+                <textarea formControlName="indicaciones" class="form-control" id="indicaciones" placeholder="Indicaciones sobre la toma del medicamento" [ngModel]="recetaSelected ? recetaSelected.indicaciones : ''"></textarea>
+              </div>
+            </form>
+          </div>
+        </div>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal" (click)="closeModal()">Cancelar</button>
+        <!-- Llama a la función guardarReceta() -->
+        <button type="button" class="btn btn-primary" (click)="guardarReceta()">{{ titleBoton }}</button>
+      </div>
+    </div>
+  </div>
+</div>

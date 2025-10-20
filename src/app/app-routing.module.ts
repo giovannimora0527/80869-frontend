@@ -8,6 +8,8 @@ import { CitaComponent } from './demo/pages/cita/cita.component';
 import { MedicamentoComponent } from './demo/pages/medicamentos/medicamento.component';
 import { EspecializacionComponent } from './demo/pages/especializacion/especializacion.component';
 import { HistoriaMedicaComponent } from './demo/pages/historia-medica/historia-medica.component';
+import { RecetasComponent } from './demo/pages/recetas/recetas.component';
+
 
 export const routes: Routes = [
   {
@@ -26,7 +28,9 @@ export const routes: Routes = [
      { path: 'cita', component: CitaComponent, data: { title: 'Cita' }},
      { path: 'medicamentos', component: MedicamentoComponent, data: { title: 'Medicamentos' }},
      { path: 'especializacion', component: EspecializacionComponent, data: { title: 'Especializacion' }},
-     { path: 'historia-medica', component: HistoriaMedicaComponent, data: { title: 'Historia Médica' }} 
+     { path: 'historia-medica', component: HistoriaMedicaComponent, data: { title: 'Historia Médica' }},
+     { path: 'recetas', component: RecetasComponent, data: { title: 'Recetas' } }
+
     ]
   },
   { path: '**', redirectTo: 'inicio' }

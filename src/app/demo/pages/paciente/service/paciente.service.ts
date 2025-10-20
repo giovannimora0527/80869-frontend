@@ -1,30 +1,29 @@
 import { Injectable } from '@angular/core';
-import { HttpClient } from '@angular/common/http';
-import { Observable } from 'rxjs';
+import { BackendService } from 'src/app/services/backend.service';
+import { environment } from 'src/environments/environment';
 import { Paciente } from '../models/paciente';
-import { RespuestRs } from '../../usuario/models/respuestars';
+import { Observable } from 'rxjs/internal/Observable';
+import { RespuestRs } from '../models/respuestars';
 
 @Injectable({
   providedIn: 'root'
 })
 export class PacienteService {
-  private baseUrl = 'http://localhost:8080/api/pacientes'; // cambia según tu backend
+  apiUrl = environment.apiUrl;
+  endpoint = 'paciente';
 
-  constructor(private http: HttpClient) {}
-
+  constructor(private readonly backendService: BackendService) {}
+  
   listarPacientes(): Observable<Paciente[]> {
-    return this.http.get<Paciente[]>(`${this.baseUrl}/listar`);
+    return this.backendService.get(this.apiUrl, this.endpoint, 'listar');
   }
 
-  crearPaciente(paciente: Paciente): Observable<RespuestRs> {
-    return this.http.post<RespuestRs>(`${this.baseUrl}/crear`, paciente);
-  }
+  crearPaciente(paciente: Paciente): Observable<RespuestRs> {   
+    return this.backendService.post(this.apiUrl, this.endpoint, 'guardar', paciente);
+  } 
 
-  actualizarPaciente(paciente: Paciente): Observable<RespuestRs> {
-    return this.http.put<RespuestRs>(`${this.baseUrl}/actualizar/${paciente.id}`, paciente);
-  }
 
-  eliminarPaciente(id: number): Observable<RespuestRs> {
-    return this.http.delete<RespuestRs>(`${this.baseUrl}/eliminar/${id}`);
-  }
+  editarPaciente(paciente: Paciente): Observable<RespuestRs> {
+    return this.backendService.post(this.apiUrl, this.endpoint, 'actualizar', paciente);
+  }
 }
