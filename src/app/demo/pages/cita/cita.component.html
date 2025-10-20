@@ -1,1 +1,41 @@
-<p>cita works!</p>
+<div class="container">
+  <div class="card">
+    <div class="card-header">
+      <div class="row">
+        <div class="col d-flex">
+          <h3 class="mb-0">
+            <i class="fa fa-users"></i>
+            Mis Citas
+          </h3>
+        </div>
+      </div>
+    </div>
+    <div class="card-body">
+      <div class="table-responsive">
+        <table class="table table-striped table-hover">
+          <thead>
+            <tr>
+              <td>Id</td>
+              <td>Fecha y Hora</td>
+              <td>Estado</td>
+              <td>Motivo</td>
+              <td>Medico</td>
+              <td>Paciente</td>
+            </tr>
+          </thead>
+           <tbody *ngIf="citaList.length > 0">
+            <tr *ngFor="let cita of citaList">
+                <td>{{ cita.id }}</td>
+                <td>{{ cita.fechaHora | date:'dd/MM/yyyy HH:mm' }}</td>
+                <td>{{ cita.estado }}</td>
+                <td>{{ cita.motivo }}</td>
+        <td>{{ cita.medico?.nombres }} {{ cita.medico?.apellidos }}</td>
+        <td>{{ cita.paciente?.nombres }} {{ cita.paciente?.apellidos }}</td>
+            </tr>
+    
+           </tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+</div>
