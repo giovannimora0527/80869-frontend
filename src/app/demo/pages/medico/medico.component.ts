@@ -3,8 +3,6 @@ import { MedicoService } from './service/medico.service';
 import { Medico } from './models/medico';
 import { CommonModule } from '@angular/common';
 
-import { NgxSpinnerModule, NgxSpinnerService } from 'ngx-spinner';
-
 import Swal from 'sweetalert2';
 import { UtilApiService } from 'src/app/services/common/util-api.service';
 import { Especializacion } from './models/especializacion';
@@ -14,7 +12,7 @@ import Modal from 'bootstrap/js/dist/modal';
 
 @Component({
   selector: 'app-medico',
-  imports: [CommonModule, FormsModule, ReactiveFormsModule, NgxSpinnerModule],
+  imports: [CommonModule, FormsModule, ReactiveFormsModule],
   templateUrl: './medico.component.html',
   styleUrl: './medico.component.scss'
 })
@@ -26,13 +24,11 @@ export class MedicoComponent {
   medicoList: Medico[] = [];
   especializacionesList: Especializacion[] = [];
   medicoSelected: Medico;
-  msjSpinner: string = 'Probando spinner ....';
 
   constructor(
     private readonly medicoService: MedicoService,
     private readonly utilApiService: UtilApiService,
-    private readonly formBuilder: FormBuilder,
-    private readonly spinner: NgxSpinnerService
+    private readonly formBuilder: FormBuilder
   ) {
     this.listarMedicos();
     this.inicializarFormulario();
@@ -56,7 +52,7 @@ export class MedicoComponent {
     this.form = this.formBuilder.group({
       tipoDocumento: ['', [Validators.required]],
       numeroDocumento: ['', [Validators.required, Validators.minLength(8)]],
-      nombres: ['', [Validators.required, Validators.minLength(3)]],
+      nombres: ['', [Validators.required]],
       apellidos: ['', [Validators.required]],
       telefono: ['', [Validators.required]],
       registroProfesional: ['', [Validators.required]],
@@ -84,14 +80,11 @@ export class MedicoComponent {
   }
 
   listarMedicos() {
-    this.spinner.show();
     this.medicoService.listarMedicos().subscribe({
       next: (data) => {
-        this.spinner.hide();
         this.medicoList = data;
       },
       error: (error) => {
-        this.spinner.hide();
         console.error('Error fetching medicos:', error);
       }
     });
@@ -123,42 +116,7 @@ export class MedicoComponent {
   }
 
   guardarMedico() {
-    this.msjSpinner = this.modoFormulario === 'C' ? 'Creando usuario ...' : 'Actualizando usuario ...';
-    this.spinner.show();
-    if (this.form.invalid) {
-      this.spinner.hide();
-      Swal.fire('Error', 'Por favor, corrija los errores en el formulario.', 'error');
-    }
-    if (this.modoFormulario === 'C') {
-      // Creacion
-      this.medicoService.guardarMedico(this.form.value).subscribe({
-        next: (data) => {
-          this.spinner.hide();
-          Swal.fire('Éxito', data.mensaje, 'success');
-          this.listarMedicos();
-          this.closeModal();
-        },
-        error: (error) => {
-          this.spinner.hide();
-          Swal.fire('Error', error.error.message, 'error');
-        }
-      });
-    } else {
-      const medicoActualizar = { ...this.medicoSelected, ...this.form.value };
-      // Edicion o actualizar
-       this.medicoService.actualizarMedico(medicoActualizar).subscribe({
-        next: (data) => {
-          this.spinner.hide();
-          Swal.fire('Éxito', data.mensaje, 'success');
-          this.listarMedicos();
-          this.closeModal();
-        },
-        error: (error) => {
-          this.spinner.hide();
-          Swal.fire('Error', error.error.message, 'error');
-        }
-      });
-    }
+    Swal.fire('Guardando medico', 'Esta usando la funcion guardar medico.', 'info');
   }
 
   abrirMedicoModal() {
