@@ -1,1 +1,43 @@
-<p>formula works!</p>
+<div class="container">
+  <div class="card">
+    <div class="card-header">
+      <div class="row">
+        <div class="col d-flex">
+          <h3 class="mb-0">
+            <i class="fa fa-users"></i>
+            Mis Formulas
+          </h3>
+        </div>
+      </div>
+    </div>
+    <div class="card-body">
+      <div class="table-responsive">
+        <table class="table table-striped table-hover">
+          <thead>
+            <tr>
+              <td>Id</td>
+              <td>Dosis</td>
+              <td>Indicaciones</td>
+              <td>Fecha de creacion</td>
+            </tr>
+          </thead>
+           <tbody *ngIf="recetaList.length > 0">
+            <tr *ngFor="let receta of recetaList">
+                <td>{{ receta.id }}</td>
+                <td>{{ receta.dosis }}</td>
+                <td>{{ receta.indicaciones }}</td>
+                <td>{{ receta.fechaCreacionRegistro | date:'dd/MM/yyyy' }}</td>
+                <td>
+                    <button class="btn btn-outline-primary" (click)="probarBoton(receta)">
+                    <i class="fa fa-edit"></i>
+                    &nbsp;Editar
+                    </button>
+                </td>
+            </tr>
+    
+           </tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+</div>
