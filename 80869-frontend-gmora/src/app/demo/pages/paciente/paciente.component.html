@@ -1,51 +1,242 @@
-<div class="container">
-  <div class="card">
-    <div class="card-header">
-      <div class="row">
-        <div class="col d-flex">
-          <h3 class="mb-0">
-            <i class="fa fa-users"></i>
-            Mis Pacientes
-          </h3>
+<div class="container-fluid">
+  <!-- Header -->
+  <div class="row mb-3">
+    <div class="col-12 d-flex justify-content-between align-items-center">
+      <h4>Gestión de Pacientes</h4>
+      <button class="btn btn-primary" (click)="mostrarFormularioNuevo()" [disabled]="cargando">
+        <i class="fas fa-plus"></i> Nuevo Paciente
+      </button>
+    </div>
+  </div>
+
+  <!-- Mensajes -->
+  <div class="row mb-3" *ngIf="mensaje">
+    <div class="col-12">
+      <div class="alert" [class]="'alert-' + (tipoMensaje === 'error' ? 'danger' : tipoMensaje)" role="alert">
+        {{ mensaje }}
+      </div>
+    </div>
+  </div>
+
+  <!-- Indicador de carga -->
+  <div class="row mb-3" *ngIf="cargando">
+    <div class="col-12 text-center">
+      <div class="spinner-border" role="status">
+        <span class="sr-only">Cargando...</span>
+      </div>
+    </div>
+  </div>
+
+  <!-- Formulario de paciente -->
+  <div class="row mb-4" *ngIf="mostrarFormulario">
+    <div class="col-12">
+      <div class="card">
+        <div class="card-header">
+          <h5>{{ modoEdicion ? 'Editar Paciente' : 'Nuevo Paciente' }}</h5>
+        </div>
+        <div class="card-body">
+          <form [formGroup]="pacienteForm" (ngSubmit)="guardarPaciente()">
+            <div class="row">
+              <div class="col-md-6 mb-3">
+                <label for="tipoDocumento" class="form-label">Tipo Documento *</label>
+                <select class="form-control" id="tipoDocumento" formControlName="tipoDocumento">
+                  <option value="">Seleccione...</option>
+                  <option value="CC">Cédula de Ciudadanía</option>
+                  <option value="TI">Tarjeta de Identidad</option>
+                  <option value="CE">Cédula de Extranjería</option>
+                  <option value="PP">Pasaporte</option>
+                </select>
+                <div class="text-danger" *ngIf="pacienteForm.get('tipoDocumento')?.invalid && pacienteForm.get('tipoDocumento')?.touched">
+                  Tipo de documento es requerido
+                </div>
+              </div>
+              <div class="col-md-6 mb-3">
+                <label for="numeroDocumento" class="form-label">Número Documento *</label>
+                <input type="text" class="form-control" id="numeroDocumento" formControlName="numeroDocumento" 
+                       [readonly]="modoEdicion">
+                <div class="text-danger" *ngIf="pacienteForm.get('numeroDocumento')?.invalid && pacienteForm.get('numeroDocumento')?.touched">
+                  Número de documento es requerido (mínimo 6 caracteres)
+                </div>
+              </div>
+            </div>
+            <div class="row">
+              <div class="col-md-6 mb-3">
+                <label for="nombres" class="form-label">Nombres *</label>
+                <input type="text" class="form-control" id="nombres" formControlName="nombres">
+                <div class="text-danger" *ngIf="pacienteForm.get('nombres')?.invalid && pacienteForm.get('nombres')?.touched">
+                  Nombres son requeridos (mínimo 2 caracteres)
+                </div>
+              </div>
+              <div class="col-md-6 mb-3">
+                <label for="apellidos" class="form-label">Apellidos *</label>
+                <input type="text" class="form-control" id="apellidos" formControlName="apellidos">
+                <div class="text-danger" *ngIf="pacienteForm.get('apellidos')?.invalid && pacienteForm.get('apellidos')?.touched">
+                  Apellidos son requeridos (mínimo 2 caracteres)
+                </div>
+              </div>
+            </div>
+            <div class="row">
+              <div class="col-md-4 mb-3">
+                <label for="fechaNacimiento" class="form-label">Fecha Nacimiento *</label>
+                <input type="date" class="form-control" id="fechaNacimiento" formControlName="fechaNacimiento">
+                <div class="text-danger" *ngIf="pacienteForm.get('fechaNacimiento')?.invalid && pacienteForm.get('fechaNacimiento')?.touched">
+                  Fecha de nacimiento es requerida
+                </div>
+              </div>
+              <div class="col-md-4 mb-3">
+                <label for="genero" class="form-label">Género *</label>
+                <select class="form-control" id="genero" formControlName="genero">
+                  <option value="">Seleccione...</option>
+                  <option value="M">Masculino</option>
+                  <option value="F">Femenino</option>
+                  <option value="O">Otro</option>
+                </select>
+                <div class="text-danger" *ngIf="pacienteForm.get('genero')?.invalid && pacienteForm.get('genero')?.touched">
+                  Género es requerido
+                </div>
+              </div>
+              <div class="col-md-4 mb-3">
+                <label for="telefono" class="form-label">Teléfono *</label>
+                <input type="text" class="form-control" id="telefono" formControlName="telefono">
+                <div class="text-danger" *ngIf="pacienteForm.get('telefono')?.invalid && pacienteForm.get('telefono')?.touched">
+                  Teléfono es requerido (mínimo 7 caracteres)
+                </div>
+              </div>
+            </div>
+            <div class="row">
+              <div class="col-12 mb-3">
+                <label for="direccion" class="form-label">Dirección *</label>
+                <input type="text" class="form-control" id="direccion" formControlName="direccion">
+                <div class="text-danger" *ngIf="pacienteForm.get('direccion')?.invalid && pacienteForm.get('direccion')?.touched">
+                  Dirección es requerida
+                </div>
+              </div>
+            </div>
+            <div class="row">
+              <div class="col-12">
+                <button type="submit" class="btn btn-success me-2" [disabled]="!pacienteForm.valid || cargando">
+                  {{ modoEdicion ? 'Actualizar' : 'Guardar' }}
+                </button>
+                <button type="button" class="btn btn-secondary" (click)="cancelarFormulario()">
+                  Cancelar
+                </button>
+              </div>
+            </div>
+          </form>
         </div>
       </div>
     </div>
-    <div class="card-body">
-      <div class="table-responsive">
-        <table class="table table-striped table-hover">
-          <thead>
-            <tr>
-              <td>Tipo de documento</td>
-              <td>#. Documento</td>
-              <td>Nombres</td>
-              <td>Apellidos</td>
-              <td>Fecha de nacimiento</td>
-              <td>Género</td>
-              <td>Teléfono</td>
-              <td>Dirección</td>
-              <td>Acciones</td>
-            </tr>
-          </thead>
-           <tbody *ngIf="pacienteList.length > 0">
-            <tr *ngFor="let paciente of pacienteList">
-                <td>{{ paciente.tipoDocumento }}</td>
-                <td>{{ paciente.numeroDocumento }}</td>
-                <td>{{ paciente.nombres }}</td>
-                <td>{{ paciente.apellidos }}</td>
-                <td>{{ paciente.fechaNacimiento | date:'dd/MM/yyyy' }}</td>
-                <td>{{ paciente.genero }}</td>
-                <td>{{ paciente.telefono }}</td>
-                <td>{{ paciente.direccion }}</td>
-                <td>
-                    <button class="btn btn-outline-primary" (click)="probarBoton(paciente)">
-                    <i class="fa fa-edit"></i>
-                    &nbsp;Editar
+  </div>
+
+  <!-- Filtros -->
+  <div class="row mb-3">
+    <div class="col-12">
+      <div class="card">
+        <div class="card-header">
+          <h6>Filtros de Búsqueda</h6>
+        </div>
+        <div class="card-body">
+          <form [formGroup]="filtroForm">
+            <div class="row">
+              <div class="col-md-2 mb-2">
+                <label for="filtroNombres" class="form-label">Nombres</label>
+                <input type="text" class="form-control" id="filtroNombres" formControlName="nombres" 
+                       placeholder="Buscar por nombres">
+              </div>
+              <div class="col-md-2 mb-2">
+                <label for="filtroApellidos" class="form-label">Apellidos</label>
+                <input type="text" class="form-control" id="filtroApellidos" formControlName="apellidos" 
+                       placeholder="Buscar por apellidos">
+              </div>
+              <div class="col-md-2 mb-2">
+                <label for="filtroDocumento" class="form-label">Documento</label>
+                <input type="text" class="form-control" id="filtroDocumento" formControlName="numeroDocumento" 
+                       placeholder="Buscar por documento">
+              </div>
+              <div class="col-md-2 mb-2">
+                <label for="filtroTelefono" class="form-label">Teléfono</label>
+                <input type="text" class="form-control" id="filtroTelefono" formControlName="telefono" 
+                       placeholder="Buscar por teléfono">
+              </div>
+              <div class="col-md-2 mb-2">
+                <label for="filtroGenero" class="form-label">Género</label>
+                <select class="form-control" id="filtroGenero" formControlName="genero">
+                  <option value="">Todos</option>
+                  <option value="M">Masculino</option>
+                  <option value="F">Femenino</option>
+                  <option value="O">Otro</option>
+                </select>
+              </div>
+              <div class="col-md-2 mb-2 d-flex align-items-end">
+                <button type="button" class="btn btn-info me-2" (click)="aplicarFiltros()" [disabled]="cargando">
+                  <i class="fas fa-search"></i> Filtrar
+                </button>
+                <button type="button" class="btn btn-outline-secondary" (click)="limpiarFiltros()">
+                  <i class="fas fa-times"></i> Limpiar
+                </button>
+              </div>
+            </div>
+          </form>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Tabla de pacientes -->
+  <div class="row">
+    <div class="col-12">
+      <div class="card">
+        <div class="card-header">
+          <h6>Lista de Pacientes ({{ pacientesFiltrados.length }} registros)</h6>
+        </div>
+        <div class="card-body">
+          <div class="table-responsive">
+            <table class="table table-bordered table-striped table-hover">
+              <thead class="table-dark">
+                <tr>
+                  <th>Tipo Doc.</th>
+                  <th>Documento</th>
+                  <th>Nombres</th>
+                  <th>Apellidos</th>
+                  <th>Fecha Nac.</th>
+                  <th>Género</th>
+                  <th>Teléfono</th>
+                  <th>Dirección</th>
+                  <th>Acciones</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr *ngFor="let paciente of pacientesFiltrados">
+                  <td>{{ paciente.tipoDocumento }}</td>
+                  <td>{{ paciente.numeroDocumento }}</td>
+                  <td>{{ paciente.nombres }}</td>
+                  <td>{{ paciente.apellidos }}</td>
+                  <td>{{ paciente.fechaNacimiento | date:'dd/MM/yyyy' }}</td>
+                  <td>
+                    <span [class]="'badge ' + (paciente.genero === 'M' ? 'bg-primary' : paciente.genero === 'F' ? 'bg-danger' : 'bg-secondary')">
+                      {{ paciente.genero === 'M' ? 'Masculino' : paciente.genero === 'F' ? 'Femenino' : 'Otro' }}
+                    </span>
+                  </td>
+                  <td>{{ paciente.telefono }}</td>
+                  <td>{{ paciente.direccion }}</td>
+                  <td>
+                    <button class="btn btn-sm btn-warning me-1" (click)="editarPaciente(paciente)" 
+                            [disabled]="cargando" title="Editar">
+                      <i class="fas fa-edit"></i>
                     </button>
-                </td>
-            </tr>
-    
-           </tbody>
-        </table>
+                    <button class="btn btn-sm btn-danger" (click)="eliminarPaciente(paciente)" 
+                            [disabled]="cargando" title="Eliminar">
+                      <i class="fas fa-trash"></i>
+                    </button>
+                  </td>
+                </tr>
+                <tr *ngIf="pacientesFiltrados.length === 0 && !cargando">
+                  <td colspan="9" class="text-center">No se encontraron pacientes</td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
       </div>
     </div>
   </div>

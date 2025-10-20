@@ -1,0 +1,116 @@
+.modal {
+  background-color: rgba(0, 0, 0, 0.5);
+}
+
+.btn-sm {
+  padding: 0.25rem 0.5rem;
+  font-size: 0.75rem;
+}
+
+.me-1 {
+  margin-right: 0.25rem;
+}
+
+// Estilos adicionales para CRUD
+.container-fluid {
+  padding: 20px;
+}
+
+.card {
+  border-radius: 8px;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+  margin-bottom: 20px;
+}
+
+.card-header {
+  background-color: #f8f9fa;
+  border-bottom: 1px solid #dee2e6;
+  padding: 12px 20px;
+}
+
+.card-header h5,
+.card-header h6 {
+  margin: 0;
+  color: #495057;
+}
+
+.table {
+  margin-bottom: 0;
+}
+
+.table th {
+  background-color: #343a40 !important;
+  color: white;
+  font-weight: 600;
+  text-align: center;
+  vertical-align: middle;
+}
+
+.table td {
+  vertical-align: middle;
+  text-align: center;
+}
+
+.btn {
+  border-radius: 4px;
+  font-weight: 500;
+}
+
+.badge {
+  font-size: 11px;
+  padding: 4px 8px;
+}
+
+.form-control {
+  border-radius: 4px;
+}
+
+.form-control:focus {
+  border-color: #007bff;
+  box-shadow: 0 0 0 0.2rem rgba(0, 123, 255, 0.25);
+}
+
+.text-danger {
+  font-size: 12px;
+  margin-top: 4px;
+}
+
+.spinner-border {
+  width: 3rem;
+  height: 3rem;
+}
+
+.alert {
+  border-radius: 4px;
+  margin-bottom: 20px;
+}
+
+.table-hover tbody tr:hover {
+  background-color: rgba(0, 0, 0, 0.075);
+}
+
+.form-label {
+  font-weight: 500;
+  color: #495057;
+  margin-bottom: 6px;
+}
+
+// Responsive adjustments
+@media (max-width: 768px) {
+  .container-fluid {
+    padding: 10px;
+  }
+  
+  .table-responsive {
+    font-size: 14px;
+  }
+  
+  .btn-sm {
+    padding: 2px 6px;
+    font-size: 11px;
+  }
+  
+  .card-body {
+    padding: 15px;
+  }
+}

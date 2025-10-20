@@ -87,7 +87,12 @@ export class BackendService {
       'Content-Type': 'application/json',
       Authorization: tokenRecuperado ? `Bearer ${tokenRecuperado}` : '',
     });
-    return this.http.get<T>(`${urlApi}/${endpoint}/${service}`, {
+    // Evitar doble slash en la URL
+    let cleanEndpoint = endpoint;
+    if (endpoint.startsWith('/')) {
+      cleanEndpoint = endpoint.substring(1);
+    }
+    return this.http.get<T>(`${urlApi}/${cleanEndpoint}/${service}`, {
       params: routerParams,
       headers: headers,
       withCredentials: true,
@@ -115,7 +120,11 @@ export class BackendService {
       'Content-Type': 'application/json',
       Authorization: tokenRecuperado ? `Bearer ${tokenRecuperado}` : '',
     });
-    return this.http.post<T>(`${urlApi}/${endpoint}/${service}`, data, {
+    let cleanEndpoint = endpoint;
+    if (endpoint.startsWith('/')) {
+      cleanEndpoint = endpoint.substring(1);
+    }
+    return this.http.post<T>(`${urlApi}/${cleanEndpoint}/${service}`, data, {
       headers: headers,
       withCredentials: true,
     });
@@ -141,11 +150,44 @@ export class BackendService {
       'Content-Type': 'application/json',
       Authorization: tokenRecuperado ? `Bearer ${tokenRecuperado}` : '',
     });
-    return this.http.put<T>(`${urlApi}/${endpoint}/${service}`, data, {
+    let cleanEndpoint = endpoint;
+    if (endpoint.startsWith('/')) {
+      cleanEndpoint = endpoint.substring(1);
+    }
+    return this.http.put<T>(`${urlApi}/${cleanEndpoint}/${service}`, data, {
       headers: headers,
     });
   }
 
+  /**
+   * Metodo generico DELETE
+   * @param urlApi URL base de la API
+   * @param endpoint Endpoint específico
+   * @param service Servicio o recurso
+   * @param routerParams Parámetros opcionales de la ruta
+   * @returns Observable<T> respuesta del servidor
+   */
+  delete<T>(
+    urlApi: string,
+    endpoint: string,
+    service: string,
+    routerParams?: HttpParams
+  ): Observable<T> {
+    const tokenRecuperado = localStorage.getItem('token') || ''; // Evita `null`
+    const headers = new HttpHeaders({
+      'Content-Type': 'application/json',
+      Authorization: tokenRecuperado ? `Bearer ${tokenRecuperado}` : '',
+    });
+    let cleanEndpoint = endpoint;
+    if (endpoint.startsWith('/')) {
+      cleanEndpoint = endpoint.substring(1);
+    }
+    return this.http.delete<T>(`${urlApi}/${cleanEndpoint}/${service}`, {
+      params: routerParams,
+      headers: headers,
+      withCredentials: true,
+    });
+  }
 
 
   postFile<T>(
@@ -160,7 +202,11 @@ export class BackendService {
       mimeType: 'multipart/form-data',
       Authorization: tokenRecuperado ? `Bearer ${tokenRecuperado}` : '',
     });
-    return this.http.post<T>(`${urlApi}/${endpoint}/${service}`, data, {
+    let cleanEndpoint = endpoint;
+    if (endpoint.startsWith('/')) {
+      cleanEndpoint = endpoint.substring(1);
+    }
+    return this.http.post<T>(`${urlApi}/${cleanEndpoint}/${service}`, data, {
       headers: headers,
       withCredentials: true,
     });

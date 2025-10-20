@@ -71,8 +71,7 @@
                   formControlName="username"
                   class="form-control"
                   id="username"
-                  placeholder="Ingrese el nombre de usuario"                 
-                  [ngModel]="usuarioSelected ? usuarioSelected.username : ''"
+                  placeholder="Ingrese el nombre de usuario"
                 />
                 <div *ngIf="form.get('username')?.hasError('required') && form.get('username')?.touched" class="text-danger">
                   El nombre de usuario es requerido.
@@ -93,7 +92,6 @@
                   class="form-control"
                   id="pass"
                   placeholder="Ingrese la contraseña del usuario"
-                  [ngModel]="usuarioSelected ? usuarioSelected.password : ''"
                 />
                 <div *ngIf="form.get('pass')?.hasError('required') && form.get('pass')?.touched" class="text-danger">
                   La contraseña es requerido.
