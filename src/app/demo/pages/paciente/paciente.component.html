@@ -1,52 +1,260 @@
-<div class="container">
-  <div class="card">
-    <div class="card-header">
-      <div class="row">
-        <div class="col d-flex">
-          <h3 class="mb-0">
-            <i class="fa fa-users"></i>
-            Mis Pacientes
-          </h3>
-        </div>
-      </div>
+<ngx-spinner type="pacman" size="medium" color="#fff">
+  <p style="color: white">{{ msjSpinner }}</p>
+</ngx-spinner>
+
+<div class="container mt-4">
+  <div class="card shadow-sm">
+    <div class="card-header d-flex justify-content-between align-items-center">
+      <h3 class="mb-0">
+        <i class="fa fa-user me-2"></i>Mis pacientes
+      </h3>
+      <button class="btn btn-primary" (click)="abrirPacienteModal()">
+        <i class="fa fa-plus"></i> &nbsp;Agregar Paciente
+      </button>
     </div>
+
     <div class="card-body">
       <div class="table-responsive">
-        <table class="table table-striped table-hover">
-          <thead>
+        <table class="table table-striped table-hover align-middle">
+          <thead class="table-primary">
             <tr>
-              <td>Tipo de documento</td>
-              <td>#. Documento</td>
-              <td>Nombres</td>
-              <td>Apellidos</td>
-              <td>Fecha de nacimiento</td>
-              <td>Género</td>
-              <td>Teléfono</td>
-              <td>Dirección</td>
-              <td>Acciones</td>
+              <th>Id</th>
+              <th>Tipo Documento</th>
+              <th>Número Documento</th>
+              <th>Nombres</th>
+              <th>Apellidos</th>
+              <th>Fecha Nacimiento</th>
+              <th>Género</th>
+              <th>Teléfono</th>
+              <th>Dirección</th>
+              <th>Acciones</th>
             </tr>
           </thead>
-           <tbody *ngIf="pacienteList.length > 0">
+          <tbody *ngIf="pacienteList.length > 0; else sinPacientes">
             <tr *ngFor="let paciente of pacienteList">
-                <td>{{ paciente.tipoDocumento }}</td>
-                <td>{{ paciente.numeroDocumento }}</td>
-                <td>{{ paciente.nombres }}</td>
-                <td>{{ paciente.apellidos }}</td>
-                <td>{{ paciente.fechaNacimiento | date:'dd/MM/yyyy' }}</td>
-                <td>{{ paciente.genero }}</td>
-                <td>{{ paciente.telefono }}</td>
-                <td>{{ paciente.direccion }}</td>
-                <td>
-                    <button class="btn btn-outline-primary" (click)="probarBoton(paciente)">
-                    <i class="fa fa-edit"></i>
-                    &nbsp;Editar
-                    </button>
-                </td>
+              <td>{{ paciente.id }}</td>
+              <td>{{ paciente.tipoDocumento }}</td>
+              <td>{{ paciente.numeroDocumento }}</td>
+              <td>{{ paciente.nombres }}</td>
+              <td>{{ paciente.apellidos }}</td>
+              <td>{{ paciente.fechaNacimiento | date: 'yyyy-MM-dd' }}</td>
+              <td>{{ paciente.genero === 'M' ? 'Masculino' : 'Femenino' }}</td>
+              <td>{{ paciente.telefono }}</td>
+              <td>{{ paciente.direccion }}</td>
+              <td>
+                <button
+                  class="btn btn-outline-primary btn-sm"
+                  (click)="editarModalPaciente(paciente)"
+                >
+                  <i class="fa fa-edit"></i> Editar
+                </button>
+              </td>
             </tr>
-    
-           </tbody>
+          </tbody>
         </table>
+
+        <ng-template #sinPacientes>
+          <div class="text-center py-3 text-muted">
+            No hay pacientes registrados.
+          </div>
+        </ng-template>
       </div>
+    </div>
+  </div>
+</div>
+
+<!-- Modal Paciente -->
+<div
+  class="modal fade"
+  id="modalCrearPaciente"
+  tabindex="-1"
+  aria-labelledby="modalCrearPacienteLabel"
+  aria-hidden="true"
+>
+  <div class="modal-dialog modal-lg modal-dialog-centered">
+    <div class="modal-content">
+      <div class="modal-header bg-primary text-white">
+        <h5 class="modal-title" id="modalCrearPacienteLabel">
+          {{ titleModal }}
+        </h5>
+        <button
+          type="button"
+          class="btn-close btn-close-white"
+          data-bs-dismiss="modal"
+          aria-label="Cerrar"
+        ></button>
+      </div>
+
+      <form [formGroup]="form">
+        <div class="modal-body">
+          <div class="row g-3">
+            <!-- Tipo Documento -->
+            <div class="col-md-6">
+              <label for="tipoDocumento" class="form-label">Tipo de Documento</label>
+              <select
+                id="tipoDocumento"
+                class="form-select"
+                formControlName="tipoDocumento"
+              >
+                <option value="" disabled>Seleccione...</option>
+                <option value="CC">Cédula de Ciudadanía</option>
+                <option value="CE">Cédula de Extranjería</option>
+                <option value="PA">Pasaporte</option>
+              </select>
+              <div
+                *ngIf="f['tipoDocumento'].touched && f['tipoDocumento'].invalid"
+                class="text-danger small"
+              >
+                El tipo de documento es obligatorio.
+              </div>
+            </div>
+
+            <!-- Número Documento -->
+            <div class="col-md-6">
+              <label for="numeroDocumento" class="form-label">Número de Documento</label>
+              <input
+                id="numeroDocumento"
+                type="text"
+                class="form-control"
+                formControlName="numeroDocumento"
+                placeholder="Ingrese número de documento"
+              />
+              <div
+                *ngIf="f['numeroDocumento'].touched && f['numeroDocumento'].invalid"
+                class="text-danger small"
+              >
+                Debe tener mínimo 5 caracteres.
+              </div>
+            </div>
+
+            <!-- Nombres -->
+            <div class="col-md-6">
+              <label for="nombres" class="form-label">Nombres</label>
+              <input
+                id="nombres"
+                type="text"
+                class="form-control"
+                formControlName="nombres"
+                placeholder="Ingrese nombres"
+              />
+              <div
+                *ngIf="f['nombres'].touched && f['nombres'].invalid"
+                class="text-danger small"
+              >
+                Ingrese al menos 3 caracteres.
+              </div>
+            </div>
+
+            <!-- Apellidos -->
+            <div class="col-md-6">
+              <label for="apellidos" class="form-label">Apellidos</label>
+              <input
+                id="apellidos"
+                type="text"
+                class="form-control"
+                formControlName="apellidos"
+                placeholder="Ingrese apellidos"
+              />
+              <div
+                *ngIf="f['apellidos'].touched && f['apellidos'].invalid"
+                class="text-danger small"
+              >
+                Ingrese al menos 3 caracteres.
+              </div>
+            </div>
+
+            <!-- Fecha Nacimiento -->
+            <div class="col-md-6">
+              <label for="fechaNacimiento" class="form-label">Fecha de Nacimiento</label>
+              <input
+                id="fechaNacimiento"
+                type="date"
+                class="form-control"
+                formControlName="fechaNacimiento"
+              />
+              <div
+                *ngIf="f['fechaNacimiento'].touched && f['fechaNacimiento'].invalid"
+                class="text-danger small"
+              >
+                La fecha de nacimiento es requerida.
+              </div>
+            </div>
+
+            <!-- Género -->
+            <div class="col-md-6">
+              <label for="genero" class="form-label">Género</label>
+              <select
+                id="genero"
+                class="form-select"
+                formControlName="genero"
+              >
+                <option value="" disabled>Seleccione...</option>
+                <option value="M">Masculino</option>
+                <option value="F">Femenino</option>
+              </select>
+              <div
+                *ngIf="f['genero'].touched && f['genero'].invalid"
+                class="text-danger small"
+              >
+                El género es requerido.
+              </div>
+            </div>
+
+            <!-- Teléfono -->
+            <div class="col-md-6">
+              <label for="telefono" class="form-label">Teléfono</label>
+              <input
+                id="telefono"
+                type="text"
+                class="form-control"
+                formControlName="telefono"
+                placeholder="Ingrese teléfono"
+              />
+              <div
+                *ngIf="f['telefono'].touched && f['telefono'].invalid"
+                class="text-danger small"
+              >
+                El teléfono es requerido.
+              </div>
+            </div>
+
+            <!-- Dirección -->
+            <div class="col-md-6">
+              <label for="direccion" class="form-label">Dirección</label>
+              <input
+                id="direccion"
+                type="text"
+                class="form-control"
+                formControlName="direccion"
+                placeholder="Ingrese dirección"
+              />
+              <div
+                *ngIf="f['direccion'].touched && f['direccion'].invalid"
+                class="text-danger small"
+              >
+                La dirección es requerida.
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div class="modal-footer">
+          <button
+            type="button"
+            class="btn btn-secondary"
+            data-bs-dismiss="modal"
+          >
+            Cancelar
+          </button>
+          <button
+            type="button"
+            class="btn btn-primary"
+            (click)="guardarPaciente()"
+          >
+            {{ titleBoton }}
+          </button>
+        </div>
+      </form>
     </div>
   </div>
 </div>
