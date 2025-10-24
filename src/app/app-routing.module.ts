@@ -1,4 +1,4 @@
-import { InventarioMedicamentoComponent } from './demo/pages/medicamentos/inventario-medicamento.component';
+import { InventarioMedicamentoComponent } from './demo/pages/inventario-medicamento/inventario-medicamento.component';
 import { NgModule } from '@angular/core';
 import { Routes, RouterModule } from '@angular/router';
 import { AdminComponent } from './theme/layout/admin/admin.component';
