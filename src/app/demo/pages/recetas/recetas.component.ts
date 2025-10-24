@@ -5,44 +5,39 @@ import Swal from 'sweetalert2';
 import { FormBuilder, FormControl, FormGroup, Validators, FormsModule, ReactiveFormsModule, AbstractControl } from '@angular/forms';
 import Modal from 'bootstrap/js/dist/modal';
 
-// Reemplazar estas rutas según la estructura de tu proyecto
+// CORREGIDO: Usar Receta
 import { RecetasService } from './service/recetas.service';
-import { Recetas} from './models/recetas';
-// Importaciones opcionales para listas secundarias (Cita, Medicamento)
-// import { UtilApiService } from 'src/app/services/common/util-api.service'; 
-
+import { Receta } from './models/recetas';
 
 @Component({
   selector: 'app-receta',
   imports: [CommonModule, FormsModule, ReactiveFormsModule],
   templateUrl: './recetas.component.html',
-  styleUrl: './recetas.component.scss',
+  styleUrls: ['./recetas.component.scss'],
   standalone: true
 })
 export class RecetasComponent implements OnInit {
   
-  // PROPIEDADES DE ESTADO Y UI (Estructura de MedicoComponent)
   modalInstance: Modal | null = null;
   modoFormulario: string = '';
   titleModal: string = '';
   titleBoton: string = '';
 
-  // Datos principales
-  recetaList: Recetas[] = [];
-  recetaSelected!: Recetas;
+  recetaList: Receta[] = []; 
+  recetaSelected!: Receta | null;
   isLoading: boolean = false;
 
-  // Formulario de Receta
+
   form: FormGroup = new FormGroup({
-    cita: new FormControl(''),
-    medicamento: new FormControl(''),
+    id: new FormControl(null), 
+    citaId: new FormControl(''),
+    medicamentoId: new FormControl(''),
     dosis: new FormControl(''),
     indicaciones: new FormControl('')
   });
 
   constructor(
     private readonly recetaService: RecetasService,
-    // private readonly utilApiService: UtilApiService,
     private readonly formBuilder: FormBuilder
   ) {
     this.inicializarFormulario();
@@ -52,28 +47,20 @@ export class RecetasComponent implements OnInit {
     this.listarRecetas();
   }
   
-  /**
-   * Proporciona acceso 'f' a los controles del formulario. (ESTRUCTURA DE MÉDICO)
-   */
   get f(): { [key: string]: AbstractControl } {
     return this.form.controls;
   }
 
-  /**
-   * Inicialización del formulario (ESTRUCTURA DE MÉDICO).
-   */
   inicializarFormulario() {
     this.form = this.formBuilder.group({
-      cita: [null, [Validators.required]],        // Asumimos objeto o ID de Cita
-      medicamento: [null, [Validators.required]], // Asumimos objeto o ID de Medicamento
+      id: [null],
+      citaId: [null, [Validators.required]],        
+      medicamentoId: [null, [Validators.required]], 
       dosis: ['', [Validators.required, Validators.maxLength(100)]],
       indicaciones: ['', [Validators.maxLength(500)]]
     });
   }
 
-  /**
-   * Carga la lista de recetas desde el backend.
-   */
   listarRecetas() {
     this.isLoading = true;
     this.recetaService.listarRecetas().subscribe({
@@ -89,17 +76,85 @@ export class RecetasComponent implements OnInit {
     });
   }
 
-  // --- PLACEHOLDERS DE ACCIONES DEL MÉDICO ---
-  openModal(modo: string) { /* Lógica de modal no implementada */ }
-  closeModal() { /* Lógica de modal no implementada */ }
+  openModal(modo: string) {
+    this.modoFormulario = modo;
+    this.titleModal = modo === 'C' ? 'Crear Nueva Receta' : 'Editar Receta';
+    this.titleBoton = modo === 'C' ? 'Guardar' : 'Actualizar';
+    const modalElement = document.getElementById('modalRecetas');
+    if (modalElement) {
+      this.modalInstance = new Modal(modalElement);
+      this.modalInstance.show();
+    }
+  }
+
+  closeModal() {
+    this.modalInstance?.hide();
+    this.limpiarFormulario();
+    this.recetaSelected = null;
+  }
   
   limpiarFormulario() {
-    this.form.reset();
+    this.form.reset({
+        id: null,
+        citaId: null,
+        medicamentoId: null,
+        dosis: '',
+        indicaciones: ''
+    });
     this.form.markAsPristine();
     this.form.markAsUntouched();
   }
   
-  guardarReceta() { Swal.fire('Guardando Receta', 'Función pendiente.', 'info'); }
-  abrirRecetaModal() { this.openModal('C'); }
-  editarModalReceta(receta: Recetas) { this.recetaSelected = receta; this.openModal('E'); }
+  guardarReceta() {
+    if (this.form.invalid) {
+        this.form.markAllAsTouched();
+        return;
+    }
+
+    const recetaData: Receta = this.form.value;
+
+    if (this.modoFormulario === 'C') {
+        this.recetaService.guardarReceta(recetaData).subscribe({
+            next: (rta) => {
+                Swal.fire('Éxito', rta.mensaje, 'success');
+                this.closeModal();
+                this.listarRecetas();
+            },
+            error: (err) => {
+                console.error(err);
+                Swal.fire('Error', err.error?.mensaje || 'No se pudo guardar la receta.', 'error');
+            }
+        });
+    } else if (this.modoFormulario === 'E') {
+        this.recetaService.actualizarReceta(recetaData).subscribe({
+            next: (rta) => {
+                Swal.fire('Éxito', rta.mensaje, 'success');
+                this.closeModal();
+                this.listarRecetas();
+            },
+            error: (err) => {
+                console.error(err);
+                Swal.fire('Error', err.error?.mensaje || 'No se pudo actualizar la receta.', 'error');
+            }
+        });
+    }
+  }
+  
+  abrirRecetaModal() { 
+    this.limpiarFormulario();
+    this.openModal('C'); 
+  }
+
+  editarModalReceta(receta: Receta) { 
+    this.recetaSelected = receta; 
+    
+    this.form.patchValue({
+      id: receta.id,
+      citaId: receta.citaId, 
+      medicamentoId: receta.medicamentoId,
+      dosis: receta.dosis,
+      indicaciones: receta.indicaciones,
+    });
+    this.openModal('E'); 
+  }
 }

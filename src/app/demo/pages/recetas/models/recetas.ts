@@ -1,11 +1,15 @@
-export class Recetas {
+export class Receta {
     id!: number;
     citaId!: number;
-    medicamentoId!: string;
+    medicamentoId!: number;
     dosis!: string;
     indicaciones!: string;
-    
-}   
+    fechaCreacionRegistro!: Date;
+}
+
+
+
+
 
 
 

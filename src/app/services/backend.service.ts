@@ -143,6 +143,7 @@ export class BackendService {
     });
     return this.http.put<T>(`${urlApi}/${endpoint}/${service}`, data, {
       headers: headers,
+      withCredentials: true,
     });
   }
 

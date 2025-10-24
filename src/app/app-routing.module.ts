@@ -1,3 +1,4 @@
+import { InventarioMedicamentoComponent } from './demo/pages/medicamentos/inventario-medicamento.component';
 import { NgModule } from '@angular/core';
 import { Routes, RouterModule } from '@angular/router';
 import { AdminComponent } from './theme/layout/admin/admin.component';
@@ -30,6 +31,7 @@ export const routes: Routes = [
      { path: 'especializacion', component: EspecializacionComponent, data: { title: 'Especializacion' }},
      { path: 'historia-medica', component: HistoriaMedicaComponent, data: { title: 'Historia Médica' }},
      { path: 'recetas', component: RecetasComponent, data: { title: 'Recetas' } }
+  ,{ path: 'inventario-medicamentos', component: InventarioMedicamentoComponent, data: { title: 'Inventario Medicamentos' } }
 
     ]
   },

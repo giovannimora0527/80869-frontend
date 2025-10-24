@@ -86,6 +86,15 @@ export const NavigationItems: NavigationItem[] = [
         icon: 'feather icon-clipboard',
         classes: 'nav-item'
       }
+      ,
+      {
+        id: 'inventario-medicamentos',
+        title: 'Inventario de Medicamentos',
+        type: 'item',
+        url: '/inicio/inventario-medicamentos',
+        icon: 'feather icon-package',
+        classes: 'nav-item'
+      }
     ]
   },
   /* ---------- Nuevos menus aqui -------------  */
