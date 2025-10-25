@@ -108,36 +108,35 @@ export class RecetasComponent implements OnInit {
   
   guardarReceta() {
     if (this.form.invalid) {
-        this.form.markAllAsTouched();
-        return;
+      this.form.markAllAsTouched();
+      return;
     }
 
     const recetaData: Receta = this.form.value;
-
     if (this.modoFormulario === 'C') {
-        this.recetaService.guardarReceta(recetaData).subscribe({
-            next: (rta) => {
-                Swal.fire('Éxito', rta.mensaje, 'success');
-                this.closeModal();
-                this.listarRecetas();
-            },
-            error: (err) => {
-                console.error(err);
-                Swal.fire('Error', err.error?.mensaje || 'No se pudo guardar la receta.', 'error');
-            }
-        });
+      this.recetaService.guardarReceta(recetaData).subscribe({
+        next: (rta) => {
+          Swal.fire('Éxito', rta.mensaje, 'success');
+          this.closeModal();
+          this.listarRecetas();
+        },
+        error: (err) => {
+          console.error(err);
+          Swal.fire('Error', err.error?.mensaje || 'No se pudo guardar la receta.', 'error');
+        }
+      });
     } else if (this.modoFormulario === 'E') {
-        this.recetaService.actualizarReceta(recetaData).subscribe({
-            next: (rta) => {
-                Swal.fire('Éxito', rta.mensaje, 'success');
-                this.closeModal();
-                this.listarRecetas();
-            },
-            error: (err) => {
-                console.error(err);
-                Swal.fire('Error', err.error?.mensaje || 'No se pudo actualizar la receta.', 'error');
-            }
-        });
+      this.recetaService.actualizarReceta(recetaData).subscribe({
+        next: (rta) => {
+          Swal.fire('Éxito', rta.mensaje, 'success');
+          this.closeModal();
+          this.listarRecetas();
+        },
+        error: (err) => {
+          console.error(err);
+          Swal.fire('Error', err.error?.mensaje || 'No se pudo actualizar la receta.', 'error');
+        }
+      });
     }
   }
   
