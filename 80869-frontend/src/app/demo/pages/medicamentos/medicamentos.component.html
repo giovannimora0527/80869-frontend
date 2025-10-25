@@ -1,0 +1,258 @@
+<div class="container">
+  <div class="card">
+    <div class="card-header">
+      <div class="d-flex justify-content-between align-items-center">
+        <h3 class="mb-0">
+          <i class="fa fa-medkit"></i>
+          &nbsp;Lista de medicamentos
+        </h3>
+        <button 
+          class="btn btn-outline-primary" 
+          (click)="abrirNuevoMedicamento()"
+          [disabled]="cargandoMedicamentos">
+          <span *ngIf="cargandoMedicamentos" class="spinner-border spinner-border-sm me-2" role="status">
+            <span class="visually-hidden">Cargando...</span>
+          </span>
+          <i *ngIf="!cargandoMedicamentos" class="fa fa-plus"></i>
+          {{ cargandoMedicamentos ? 'Cargando...' : 'Nuevo medicamento' }}
+        </button>
+      </div>
+    </div>
+
+    <div class="card-body">
+      <!-- Barra de búsqueda -->
+      <div class="row mb-3">
+        <div class="col-md-4">
+          <div class="input-group">
+            <span class="input-group-text">
+              <i class="fa fa-pills"></i>
+            </span>
+            <input type="text" class="form-control" 
+                   [(ngModel)]="busquedaNombre" 
+                   (input)="buscarMedicamentos()" 
+                   [disabled]="cargandoMedicamentos"
+                   placeholder="Buscar por nombre del medicamento...">
+          </div>
+        </div>
+        <div class="col-md-4">
+          <div class="input-group">
+            <span class="input-group-text">
+              <i class="fa fa-box"></i>
+            </span>
+            <input type="text" class="form-control" 
+                   [(ngModel)]="busquedaPresentacion" 
+                   (input)="buscarMedicamentos()" 
+                   [disabled]="cargandoMedicamentos"
+                   placeholder="Buscar por presentación...">
+          </div>
+        </div>
+        <div class="col-md-4">
+          <button class="btn btn-outline-secondary" 
+                  type="button" 
+                  (click)="limpiarBusqueda()"
+                  [disabled]="cargandoMedicamentos">
+            <i class="fa fa-times"></i>
+            Limpiar búsqueda
+          </button>
+          <!-- Indicador de estado general -->
+          <div *ngIf="cargandoMedicamentos" class="mt-2">
+            <small class="text-muted d-flex align-items-center">
+              <div class="spinner-border spinner-border-sm me-2" role="status">
+                <span class="visually-hidden">Cargando...</span>
+              </div>
+              Cargando medicamentos...
+            </small>
+          </div>
+        </div>
+      </div>
+      
+      <div class="table-responsive">
+        <table class="table table-striped table-hover align-middle">
+          <thead>
+            <tr>
+              <th class="sortable-header" (click)="ordenarPor('id')">
+                ID <i [class]="getIconoOrden('id')"></i>
+              </th>
+              <th class="sortable-header" (click)="ordenarPor('nombre')">
+                Nombre <i [class]="getIconoOrden('nombre')"></i>
+              </th>
+              <th class="sortable-header" (click)="ordenarPor('descripcion')">
+                Descripción <i [class]="getIconoOrden('descripcion')"></i>
+              </th>
+              <th class="sortable-header" (click)="ordenarPor('presentacion')">
+                Presentación <i [class]="getIconoOrden('presentacion')"></i>
+              </th>
+              <th class="sortable-header" (click)="ordenarPor('fechaCompra')">
+                Fecha Compra <i [class]="getIconoOrden('fechaCompra')"></i>
+              </th>
+              <th class="sortable-header" (click)="ordenarPor('fechaVence')">
+                Fecha Vence <i [class]="getIconoOrden('fechaVence')"></i>
+              </th>
+              <th style="width: 90px;">Acción</th>
+            </tr>
+          </thead>
+          <tbody>
+            <!-- Spinner de carga -->
+            <tr *ngIf="cargandoMedicamentos">
+              <td colspan="7" class="text-center py-4">
+                <div class="d-flex justify-content-center align-items-center">
+                  <div class="spinner-border text-primary me-2" role="status">
+                    <span class="visually-hidden">Cargando...</span>
+                  </div>
+                  <span class="text-muted">Cargando medicamentos...</span>
+                </div>
+              </td>
+            </tr>
+            
+            <tr *ngFor="let medicamento of medicamentosList">
+              <td>{{ medicamento.id }}</td>
+              <td>{{ medicamento.nombre }}</td>
+              <td>{{ medicamento.descripcion }}</td>
+              <td>{{ medicamento.presentacion }}</td>
+              <td>{{ medicamento.fechaCompra | date:'yyyy-MM-dd' }}</td>
+              <td>{{ medicamento.fechaVence | date:'yyyy-MM-dd' }}</td>
+              <td>
+                <button type="button"
+                        class="btn btn-outline-primary btn-sm"
+                        title="Editar medicamento"
+                        (click)="editarModalMedicamento(medicamento)">
+                  <i class="fa fa-edit"></i>
+                </button>
+              </td>
+            </tr>
+            
+            <!-- Mensaje cuando no hay datos -->
+            <tr *ngIf="!cargandoMedicamentos && (!medicamentosList || medicamentosList.length === 0)">
+              <td colspan="7" class="text-center text-muted py-4">
+                No hay medicamentos registrados.
+              </td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Modal Crear/Editar Medicamento -->
+<div class="modal fade" id="modalCrearMedicamento" tabindex="-1" aria-labelledby="modalCrearMedicamentoLabel" aria-hidden="true">
+  <div class="modal-dialog modal-lg">
+    <div class="modal-content">
+      <form [formGroup]="form" (ngSubmit)="guardarMedicamento()">
+        <div class="modal-header">
+          <h1 class="modal-title fs-5" id="modalCrearMedicamentoLabel">{{ titleModal }}</h1>
+          <button type="button"
+                  class="btn-close"
+                  data-bs-dismiss="modal"
+                  aria-label="Close"
+                  (click)="closeModal()"></button>
+        </div>
+
+        <div class="modal-body">
+          <div class="row g-3">
+            <div class="col-md-6">
+              <label class="form-label">Nombre *</label>
+              <input type="text" 
+                     class="form-control" 
+                     formControlName="nombre" 
+                     [class.is-invalid]="nombre?.invalid && nombre?.touched"
+                     maxlength="100" 
+                     placeholder="Nombre del medicamento">
+              <div class="invalid-feedback" *ngIf="nombre?.invalid && nombre?.touched">
+                <div *ngIf="nombre?.errors?.['required']">
+                  El nombre es obligatorio.
+                </div>
+                <div *ngIf="nombre?.errors?.['maxlength']">
+                  El nombre no debe exceder los 100 caracteres.
+                </div>
+                <div *ngIf="nombre?.errors?.['pattern']">
+                  El nombre solo puede contener letras y espacios.
+                </div>
+              </div>
+            </div>
+
+            <div class="col-md-6">
+              <label class="form-label">Presentación *</label>
+              <input type="text" 
+                     class="form-control" 
+                     formControlName="presentacion" 
+                     [class.is-invalid]="presentacion?.invalid && presentacion?.touched"
+                     maxlength="100" 
+                     placeholder="Ej: Tabletas, Jarabe, etc.">
+              <div class="invalid-feedback" *ngIf="presentacion?.invalid && presentacion?.touched">
+                <div *ngIf="presentacion?.errors?.['required']">
+                  La presentación es obligatoria.
+                </div>
+                <div *ngIf="presentacion?.errors?.['maxlength']">
+                  La presentación no debe exceder los 100 caracteres.
+                </div>
+                <div *ngIf="presentacion?.errors?.['pattern']">
+                  La presentación contiene caracteres no válidos.
+                </div>
+              </div>
+            </div>
+
+            <div class="col-md-12">
+              <label class="form-label">Descripción *</label>
+              <textarea rows="2" 
+                        class="form-control" 
+                        formControlName="descripcion" 
+                        [class.is-invalid]="descripcion?.invalid && descripcion?.touched"
+                        placeholder="Descripción del medicamento">
+              </textarea>
+              <div class="invalid-feedback" *ngIf="descripcion?.invalid && descripcion?.touched">
+                <div *ngIf="descripcion?.errors?.['required']">
+                  La descripción es obligatoria.
+                </div>
+                <div *ngIf="descripcion?.errors?.['maxlength']">
+                  La descripción no debe exceder los 500 caracteres.
+                </div>
+              </div>
+            </div>
+
+            <div class="col-md-6">
+              <label class="form-label">Fecha de compra *</label>
+              <input type="date" 
+                     class="form-control" 
+                     formControlName="fechaCompra"
+                     [class.is-invalid]="fechaCompra?.invalid && fechaCompra?.touched">
+              <div class="invalid-feedback" *ngIf="fechaCompra?.invalid && fechaCompra?.touched">
+                <div *ngIf="fechaCompra?.errors?.['required']">
+                  La fecha de compra es obligatoria.
+                </div>
+              </div>
+            </div>
+
+            <div class="col-md-6">
+              <label class="form-label">Fecha de vencimiento *</label>
+              <input type="date" 
+                     class="form-control" 
+                     formControlName="fechaVence"
+                     [class.is-invalid]="fechaVence?.invalid && fechaVence?.touched">
+              <div class="invalid-feedback" *ngIf="fechaVence?.invalid && fechaVence?.touched">
+                <div *ngIf="fechaVence?.errors?.['required']">
+                  La fecha de vencimiento es obligatoria.
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div class="modal-footer">
+          <button type="button"
+                  class="btn btn-secondary"
+                  (click)="closeModal()"
+                  [disabled]="guardando">
+            Cerrar
+          </button>
+
+          <button type="submit"
+                  class="btn btn-primary"
+                  [disabled]="guardando || form.invalid">
+            {{ guardando ? 'Guardando...' : titleBoton }}
+          </button>
+        </div>
+      </form>
+    </div>
+  </div>
+</div>

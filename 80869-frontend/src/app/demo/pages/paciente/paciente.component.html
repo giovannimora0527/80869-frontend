@@ -1,0 +1,180 @@
+<div class="container">
+  <div class="card">
+    <div class="card-header">
+      <div class="d-flex justify-content-between align-items-center">
+        <h3>
+          <i class="fa fa-users"></i>
+          &nbsp;Lista de Pacientes
+        </h3>
+        <div>
+          <button class="btn btn-outline-primary" (click)="abrirNuevoPaciente()">
+            <i class="fa fa-plus"></i>
+            Nuevo Paciente
+          </button>
+        </div>
+      </div>
+    </div>
+    <div class="card-body">
+      <!-- Barra de búsqueda flotante y moderna para pacientes -->
+      <div class="row justify-content-center mb-4">
+        <div class="col-12 col-md-8">
+          <div style="background: #fff; border-radius: 2rem; box-shadow: 0 4px 24px rgba(0,0,0,0.08); padding: 1.2rem 2rem; display: flex; align-items: center; gap: 1rem;">
+            <i class="fa fa-user fa-lg text-primary"></i>
+            <input type="text" class="form-control border-0 shadow-none" style="background: transparent; font-size: 1.1rem;" placeholder="Buscar por nombre o apellido..." [(ngModel)]="busquedaNombre" (input)="buscarPacientes()" name="busquedaNombre">
+            <i class="fa fa-id-card fa-lg text-info"></i>
+            <input type="text" class="form-control border-0 shadow-none" style="background: transparent; font-size: 1.1rem;" placeholder="Buscar por documento..." [(ngModel)]="busquedaDocumento" (input)="buscarPacientes()" name="busquedaDocumento">
+            <button type="button" class="btn btn-outline-secondary rounded-pill px-3" (click)="limpiarBusqueda()">
+              <i class="fa fa-times"></i>
+            </button>
+          </div>
+        </div>
+      </div>
+      
+      <div class="table-responsive">
+        <table class="table table-striped table-hover">
+          <thead>
+            <tr>
+              <th class="sortable-header" (click)="ordenarPor('id')">
+                Id <i [class]="getIconoOrden('id')"></i>
+              </th>
+              <th class="sortable-header" (click)="ordenarPor('tipoDocumento')">
+                Tipo de Documento <i [class]="getIconoOrden('tipoDocumento')"></i>
+              </th>
+              <th class="sortable-header" (click)="ordenarPor('numeroDocumento')">
+                # Documento <i [class]="getIconoOrden('numeroDocumento')"></i>
+              </th>
+              <th class="sortable-header" (click)="ordenarPor('nombres')">
+                Nombres <i [class]="getIconoOrden('nombres')"></i>
+              </th>
+              <th class="sortable-header" (click)="ordenarPor('apellidos')">
+                Apellidos <i [class]="getIconoOrden('apellidos')"></i>
+              </th>
+              <th class="sortable-header" (click)="ordenarPor('fechaNacimiento')">
+                Fecha Nacimiento <i [class]="getIconoOrden('fechaNacimiento')"></i>
+              </th>
+              <th class="sortable-header" (click)="ordenarPor('genero')">
+                Género <i [class]="getIconoOrden('genero')"></i>
+              </th>
+              <th class="sortable-header" (click)="ordenarPor('telefono')">
+                Teléfono <i [class]="getIconoOrden('telefono')"></i>
+              </th>
+              <th class="sortable-header" (click)="ordenarPor('direccion')">
+                Dirección <i [class]="getIconoOrden('direccion')"></i>
+              </th>
+              <th>Acción</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr *ngFor="let paciente of pacienteList">
+              <td>{{ paciente.id }}</td>
+              <td>{{ paciente.tipoDocumento }}</td>
+              <td>{{ paciente.numeroDocumento }}</td>
+              <td>{{ paciente.nombres }}</td>
+              <td>{{ paciente.apellidos }}</td>
+              <td>{{ paciente.fechaNacimiento | date:'dd/MM/yyyy' }}</td>
+              <td>{{ paciente.genero }}</td>
+              <td>{{ paciente.telefono || 'N/A' }}</td>
+              <td>{{ paciente.direccion || 'N/A' }}</td>
+              <td>
+                <button type="button" class="btn btn-outline-primary btn-sm" title="Editar paciente"
+                (click)="editarModalPaciente(paciente)">
+                  <i class="fa fa-edit"></i>
+                </button>
+              </td>
+            </tr>
+            <tr *ngIf="pacienteList.length === 0">
+              <td colspan="10" class="text-center text-muted py-3">
+                <i class="fa fa-users"></i> No hay pacientes registrados
+              </td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Modal para crear/editar paciente -->
+<div class="modal fade" id="modalCrearPaciente" tabindex="-1" aria-labelledby="modalCrearPacienteLabel" aria-hidden="true">
+  <div class="modal-dialog modal-lg">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h1 class="modal-title fs-5" id="modalCrearPacienteLabel">
+          {{ titleModal }}
+        </h1>
+        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+      </div>
+      <div class="modal-body">
+        <form>
+          <div class="row">
+            <div class="col-md-6 mb-3">
+              <label for="tipoDocumento" class="form-label">Tipo de Documento *</label>
+              <select class="form-select" id="tipoDocumento" [(ngModel)]="pacienteSelected.tipoDocumento" name="tipoDocumento" required>
+                <option value="">Seleccione tipo de documento</option>
+                <option *ngFor="let tipo of tiposDocumento" [value]="tipo.value">{{ tipo.label }}</option>
+              </select>
+            </div>
+            <div class="col-md-6 mb-3">
+              <label for="numeroDocumento" class="form-label">Número de Documento *</label>
+              <input type="text" class="form-control" id="numeroDocumento" 
+                     [(ngModel)]="pacienteSelected.numeroDocumento" 
+                     name="numeroDocumento" required placeholder="Ingrese número de documento">
+            </div>
+          </div>
+          <div class="row">
+            <div class="col-md-6 mb-3">
+              <label for="nombres" class="form-label">Nombres *</label>
+              <input type="text" class="form-control" id="nombres" 
+                     [(ngModel)]="pacienteSelected.nombres" 
+                     name="nombres" required placeholder="Ingrese nombres">
+            </div>
+            <div class="col-md-6 mb-3">
+              <label for="apellidos" class="form-label">Apellidos *</label>
+              <input type="text" class="form-control" id="apellidos" 
+                     [(ngModel)]="pacienteSelected.apellidos" 
+                     name="apellidos" required placeholder="Ingrese apellidos">
+            </div>
+          </div>
+          <div class="row">
+            <div class="col-md-6 mb-3">
+              <label for="fechaNacimiento" class="form-label">Fecha de Nacimiento *</label>
+              <input type="date" class="form-control" id="fechaNacimiento" 
+                     [(ngModel)]="pacienteSelected.fechaNacimiento" 
+                     name="fechaNacimiento" required>
+            </div>
+            <div class="col-md-6 mb-3">
+              <label for="genero" class="form-label">Género *</label>
+              <select class="form-select" id="genero" [(ngModel)]="pacienteSelected.genero" name="genero" required>
+                <option value="">Seleccione género</option>
+                <option *ngFor="let genero of generosDisponibles" [value]="genero.value">{{ genero.label }}</option>
+              </select>
+            </div>
+          </div>
+          <div class="row">
+            <div class="col-md-6 mb-3">
+              <label for="telefono" class="form-label">Teléfono</label>
+              <input type="tel" class="form-control" id="telefono" 
+                     [(ngModel)]="pacienteSelected.telefono" 
+                     name="telefono" placeholder="Ingrese teléfono">
+            </div>
+          </div>
+          <div class="row">
+            <div class="col-12 mb-3">
+              <label for="direccion" class="form-label">Dirección</label>
+              <textarea class="form-control" id="direccion" rows="3"
+                        [(ngModel)]="pacienteSelected.direccion" 
+                        name="direccion" placeholder="Ingrese dirección completa"></textarea>
+            </div>
+          </div>
+        </form>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal" [disabled]="guardando">Cerrar</button>
+        <button type="button" class="btn btn-primary" (click)="guardarPaciente()" [disabled]="guardando">
+          <span *ngIf="guardando" class="spinner-border spinner-border-sm me-2" role="status" aria-hidden="true"></span>
+          {{ guardando ? 'Guardando...' : titleBoton }}
+        </button>
+      </div>
+    </div>
+  </div>
+</div>

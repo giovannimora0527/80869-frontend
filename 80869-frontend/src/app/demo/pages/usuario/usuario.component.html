@@ -1,0 +1,213 @@
+<div class="container">
+  <!-- Barra de búsqueda flotante y moderna -->
+  <div class="row justify-content-center mb-4">
+    <div class="col-12 col-md-7">
+      <div style="background: #fff; border-radius: 2rem; box-shadow: 0 4px 24px rgba(0,0,0,0.08); padding: 1.2rem 2rem; display: flex; align-items: center; gap: 1rem;">
+        <i class="fa fa-search fa-lg text-primary"></i>
+        <input type="text" class="form-control border-0 shadow-none" style="background: transparent; font-size: 1.1rem;" placeholder="Buscar usuario por nombre..." [(ngModel)]="nombreBusqueda" name="nombreBusqueda">
+        <button type="button" class="btn btn-primary rounded-pill px-4" (click)="buscarPorNombre()">
+          <i class="fa fa-search"></i> Buscar
+        </button>
+      </div>
+    </div>
+  </div>
+  <!-- Filtros de rol y estado en tarjetas pequeñas -->
+  <div class="row mb-4 justify-content-center g-3">
+    <div class="col-12 col-md-3">
+      <div style="background: #f5f7fa; border-radius: 1rem; box-shadow: 0 2px 8px rgba(0,0,0,0.04); padding: 1.2rem; display: flex; align-items: center; gap: 0.7rem;">
+        <i class="fa fa-user-tag fa-lg text-info"></i>
+        <select class="form-select border-0 bg-transparent" style="font-size: 1.05rem;" [(ngModel)]="rolSeleccionado" (change)="filtrarPorRol()" name="rolSeleccionado">
+          <option value="">Todos los roles</option>
+          <option value="ADMIN">ADMIN</option>
+          <option value="MEDICO">MEDICO</option>
+          <option value="PACIENTE">PACIENTE</option>
+        </select>
+      </div>
+    </div>
+    <div class="col-12 col-md-3">
+      <div style="background: #f5f7fa; border-radius: 1rem; box-shadow: 0 2px 8px rgba(0,0,0,0.04); padding: 1.2rem; display: flex; align-items: center; gap: 0.7rem;">
+        <i class="fa fa-toggle-on fa-lg text-success"></i>
+        <select class="form-select border-0 bg-transparent" style="font-size: 1.05rem;" [(ngModel)]="estadoSeleccionado" (change)="filtrarPorEstado()" name="estadoSeleccionado">
+          <option value="">Todos</option>
+          <option [ngValue]="1">Activos</option>
+          <option [ngValue]="0">Inactivos</option>
+        </select>
+      </div>
+    </div>
+  </div>
+  <!-- Filtros de rol y estado en tarjetas separadas -->
+  <div class="row mb-4 justify-content-center">
+    <div class="col-12 col-md-4 mb-2 mb-md-0">
+      <div class="card shadow-sm border-0">
+        <div class="card-body py-3">
+          <div class="input-group">
+            <span class="input-group-text bg-white"><i class="fa fa-user-tag"></i></span>
+            <select class="form-select" [(ngModel)]="rolSeleccionado" (change)="filtrarPorRol()" name="rolSeleccionado">
+              <option value="">Todos los roles</option>
+              <option value="ADMIN">ADMIN</option>
+              <option value="MEDICO">MEDICO</option>
+              <option value="PACIENTE">PACIENTE</option>
+            </select>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="col-12 col-md-4">
+      <div class="card shadow-sm border-0">
+        <div class="card-body py-3">
+          <div class="input-group">
+            <span class="input-group-text bg-white"><i class="fa fa-toggle-on"></i></span>
+            <select class="form-select" [(ngModel)]="estadoSeleccionado" (change)="filtrarPorEstado()" name="estadoSeleccionado">
+              <option value="">Todos</option>
+              <option [ngValue]="1">Activos</option>
+              <option [ngValue]="0">Inactivos</option>
+            </select>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+  <div class="card">
+    <div class="card-header">
+      <div class="d-flex justify-content-between align-items-center">
+        <h3 class="mb-0">
+          <i class="fa fa-users"></i>
+          &nbsp;Lista de usuarios
+        </h3>
+        <button class="btn btn-outline-primary" (click)="abrirNuevoUsuario()">
+          <i class="fa fa-plus"></i>
+          Nuevo usuario
+        </button>
+      </div>
+    </div>
+    <div class="card-body">
+      <div class="table-responsive">
+        <table class="table table-striped table-hover">
+          <thead>
+            <tr>
+              <th>Id</th>
+              <th>Nombre de usuario</th>
+              <th>Rol</th>
+              <th>Fecha de creación</th>
+              <th>Estado</th>
+              <th>Acción</th>
+            </tr>
+          </thead>
+          <tbody *ngIf="usuarios && usuarios.length > 0">
+            <tr *ngFor="let usuario of usuarios">
+              <td>{{ usuario.id }}</td>
+              <td>{{ usuario.username }}</td>
+              <td>{{ usuario.rol }}</td>
+              <td>{{ usuario.fechaCreacion | date: 'yyyy-MM-dd HH:mm' }}</td>
+              <td>
+                <i class="fa" [ngClass]="usuario.activo ? 'fa-check text-success' : 'fa-times text-danger'"></i>
+              </td>
+              <td>
+                <button type="button" class="btn btn btn-outline-primary" title="Editar usuario" (click)="abrirEditarUsuario(usuario)">
+                  <i class="fa fa-edit"></i>
+                </button>
+              </td>
+            </tr>
+          </tbody>
+          <tbody *ngIf="usuarios && usuarios.length === 0">
+            <tr>
+              <td colspan="6" class="text-center">No hay usuarios disponibles.</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Modal para nuevo usuario -->
+<div class="modal fade" id="modalCrearUsuario" tabindex="-1" aria-labelledby="modalCrearUsuarioLabel" aria-hidden="true">
+  <div class="modal-dialog modal-lg">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h1 class="modal-title fs-5" id="modalCrearUsuarioLabel">
+          {{ titleModal }}
+        </h1>
+        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+      </div>
+      <div class="modal-body">
+        <div class="row">
+          <div class="col">
+            <form [formGroup]="form">
+              <!--  Nombre de usuario -->
+              <div class="mb-3">
+                <label for="username" class="form-label">Nombre de usuario</label>
+                <input
+                  type="text"
+                  formControlName="username"
+                  class="form-control"
+                  id="username"
+                  placeholder="Ingrese el nombre de usuario"
+                  [ngModel]="usuarioSelected ? usuarioSelected.username : ''"
+                />
+                <div *ngIf="form.get('username')?.hasError('required') && form.get('username')?.touched" class="text-danger">
+                  El nombre de usuario es requerido.
+                </div>
+              </div>
+              <!-- Password -->
+              <div class="mb-3">
+                <label for="password" class="form-label">Contraseña</label>
+                <div class="input-group">
+                  <input
+                    [type]="mostrarPassword ? 'text' : 'password'"
+                    formControlName="password"
+                    class="form-control"
+                    id="password"
+                    placeholder="Ingrese la contraseña de usuario"
+                    [ngModel]="usuarioSelected?.password || ''"
+                  />
+                  <button type="button" class="btn btn-outline-secondary" (click)="mostrarPassword = !mostrarPassword" tabindex="-1">
+                    <i class="fa" style="margin-left: 10px" [ngClass]="mostrarPassword ? 'fa-eye-slash' : 'fa-eye'"></i>
+                  </button>
+                </div>
+              
+                <div *ngIf="form.get('password')?.hasError('required') && form.get('password')?.touched && modoFormulario === 'C'" class="text-danger">
+                  La contraseña es requerida.
+                </div>
+        
+                <div *ngIf="form.get('password')?.hasError('minlength') && form.get('password')?.touched && form.get('password')?.value" class="text-danger">
+                  La contraseña debe ser al menos de 8 caracteres.
+                </div>
+                <div *ngIf="form.get('password')?.hasError('maxlength') && form.get('password')?.touched && form.get('password')?.value" class="text-danger">
+                  La contraseña debe ser máximo de 16 caracteres.
+                </div>
+              </div>
+       
+              <div class="mb-3">
+                <label for="rol" class="form-label">Rol</label>
+                <select formControlName="rol" class="form-control" id="rol" [ngModel]="usuarioSelected?.rol || ''">
+                  <option value="" disabled selected>Seleccione el rol de usuario</option>
+                  <option value="ADMIN">ADMIN</option>
+                  <option value="MEDICO">MEDICO</option>
+                  <option value="PACIENTE">PACIENTE</option>
+                </select>
+                <div *ngIf="form.get('rol')?.hasError('required') && form.get('rol')?.touched" class="text-danger">
+                  El rol de usuario es requerido.
+                </div>
+              </div>
+
+      
+              <div class="mb-3" *ngIf="modoFormulario === 'E'">
+                <label for="activo" class="form-label">Estado</label>
+                <select formControlName="activo" class="form-control" id="activo" [ngModel]="usuarioSelected?.activo || false">
+                  <option value="" disabled selected>Seleccione el estado del usuario</option>
+                  <option value="true">Activo</option>
+                  <option value="false">Inactivo</option>
+                </select>
+              </div>
+            </form>
+          </div>
+        </div>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cerrar</button>
+        <button type="button" class="btn btn-primary" (click)="guardarUsuario()">{{ titleBoton }}</button>
+      </div>
+    </div>
+  </div>
+</div>

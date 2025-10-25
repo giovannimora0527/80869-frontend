@@ -1,0 +1,225 @@
+<div class="container">
+  <div class="card">
+    <div class="card-header">
+      <div class="d-flex justify-content-between align-items-center">
+        <h3 class="mb-0">
+          <i class="fa fa-prescription"></i>
+          &nbsp;Lista de recetas
+        </h3>
+        <button 
+          class="btn btn-outline-primary" 
+          (click)="abrirNuevaReceta()"
+          [disabled]="cargandoCitas || cargandoMedicamentos">
+          <span *ngIf="cargandoCitas || cargandoMedicamentos" class="spinner-border spinner-border-sm me-2" role="status">
+            <span class="visually-hidden">Cargando...</span>
+          </span>
+          <i *ngIf="!cargandoCitas && !cargandoMedicamentos" class="fa fa-plus"></i>
+          {{ (cargandoCitas || cargandoMedicamentos) ? 'Cargando...' : 'Nueva receta' }}
+        </button>
+      </div>
+    </div>
+
+    <div class="card-body">
+      <!-- Barra de búsqueda flotante y moderna para recetas -->
+      <div class="row justify-content-center mb-4">
+        <div class="col-12 col-md-10">
+          <div style="background: #fff; border-radius: 2rem; box-shadow: 0 4px 24px rgba(0,0,0,0.08); padding: 1.2rem 2rem; display: flex; align-items: center; gap: 1rem; flex-wrap: wrap;">
+            <i class="fa fa-hashtag fa-lg text-primary"></i>
+            <input type="text" class="form-control border-0 shadow-none" style="background: transparent; font-size: 1.1rem; max-width: 220px;" placeholder="Buscar por ID de cita..." [(ngModel)]="busquedaCitaId" (input)="buscarRecetas()" [disabled]="cargandoRecetas" name="busquedaCitaId">
+            <i class="fa fa-pills fa-lg text-info"></i>
+            <input type="text" class="form-control border-0 shadow-none" style="background: transparent; font-size: 1.1rem; max-width: 220px;" placeholder="Buscar por medicamento..." [(ngModel)]="busquedaMedicamento" (input)="buscarRecetas()" [disabled]="cargandoRecetas" name="busquedaMedicamento">
+            <button type="button" class="btn btn-outline-secondary rounded-pill px-3" (click)="limpiarBusqueda()" [disabled]="cargandoRecetas">
+              <i class="fa fa-times"></i>
+            </button>
+            <div *ngIf="cargandoRecetas || cargandoCitas || cargandoMedicamentos" class="ms-3">
+              <small class="text-muted d-flex align-items-center">
+                <div class="spinner-border spinner-border-sm me-2" role="status">
+                  <span class="visually-hidden">Cargando...</span>
+                </div>
+                Actualizando datos...
+              </small>
+            </div>
+          </div>
+        </div>
+      </div>
+      
+      <div class="table-responsive">
+        <table class="table table-striped table-hover align-middle">
+          <thead>
+            <tr>
+              <th class="sortable-header" (click)="ordenarPor('id')">
+                ID <i [class]="getIconoOrden('id')"></i>
+              </th>
+              <th class="sortable-header" (click)="ordenarPor('citaId')">
+                Cita ID <i [class]="getIconoOrden('citaId')"></i>
+              </th>
+              <th class="sortable-header" (click)="ordenarPor('nombreMedicamento')">
+                Medicamento <i [class]="getIconoOrden('nombreMedicamento')"></i>
+              </th>
+              <th class="sortable-header" (click)="ordenarPor('dosis')">
+                Dosis <i [class]="getIconoOrden('dosis')"></i>
+              </th>
+              <th class="sortable-header" (click)="ordenarPor('indicaciones')">
+                Indicaciones <i [class]="getIconoOrden('indicaciones')"></i>
+              </th>
+              <th class="sortable-header" (click)="ordenarPor('fechaCreacionRegistro')">
+                Fecha de creación <i [class]="getIconoOrden('fechaCreacionRegistro')"></i>
+              </th>
+              <th style="width: 90px;">Acción</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr *ngFor="let receta of recetasList">
+              <td>{{ receta.id }}</td>
+              <td>{{ receta.citaId }}</td>
+              <td>{{ receta.nombreMedicamento }}</td>
+              <td>{{ receta.dosis }}</td>
+              <td>{{ receta.indicaciones || 'Sin indicaciones' }}</td>
+              <td>{{ receta.fechaCreacionRegistro | date:'yyyy-MM-dd HH:mm' }}</td>
+              <td>
+                <button type="button"
+                        class="btn btn-outline-primary btn-sm"
+                        title="Editar receta"
+                        (click)="editarModalReceta(receta)">
+                  <i class="fa fa-edit"></i>
+                </button>
+              </td>
+            </tr>
+            <!-- Spinner de carga -->
+            <tr *ngIf="cargandoRecetas">
+              <td colspan="7" class="text-center py-4">
+                <div class="d-flex justify-content-center align-items-center">
+                  <div class="spinner-border text-primary me-2" role="status">
+                    <span class="visually-hidden">Cargando...</span>
+                  </div>
+                  <span class="text-muted">Cargando recetas...</span>
+                </div>
+              </td>
+            </tr>
+            
+            <!-- Mensaje cuando no hay datos -->
+            <tr *ngIf="!cargandoRecetas && (!recetasList || recetasList.length === 0)">
+              <td colspan="7" class="text-center text-muted py-4">
+                No hay recetas registradas.
+              </td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Modal para crear o editar recetas -->
+<div class="modal fade" id="modalCrearReceta" tabindex="-1" aria-labelledby="modalCrearRecetaLabel" aria-hidden="true">
+  <div class="modal-dialog modal-lg">
+    <div class="modal-content">
+      <form [formGroup]="form" (ngSubmit)="guardarReceta()">
+        <div class="modal-header">
+          <h1 class="modal-title fs-5" id="modalCrearRecetaLabel">{{ titleModal }}</h1>
+          <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close" (click)="closeModal()"></button>
+        </div>
+        <div class="modal-body">
+          <!-- Mensaje informativo sobre citas disponibles -->
+          <div class="alert alert-info mb-3" *ngIf="citasList && citasList.length > 0">
+            <i class="fa fa-info-circle me-2"></i>
+            <strong>Información:</strong> Se muestran las citas disponibles para crear recetas.
+          </div>
+          
+          <div class="alert alert-warning mb-3" *ngIf="!citasList || citasList.length === 0">
+            <i class="fa fa-exclamation-triangle me-2"></i>
+            <strong>Atención:</strong> No hay citas disponibles para crear recetas en este momento.
+          </div>
+
+          <div class="row g-3">
+            <div class="col-md-6">
+              <label class="form-label">Cita *</label>
+              <div class="position-relative">
+                <select class="form-select" 
+                        formControlName="citaId" 
+                        [class.is-invalid]="citaId?.invalid && citaId?.touched"
+                        [disabled]="cargandoCitas">
+                  <option value="">{{ cargandoCitas ? 'Cargando citas...' : 'Seleccionar cita...' }}</option>
+                  <option *ngFor="let cita of citasList" [value]="cita.id">
+                    {{ cita.fechaHora | date:'yyyy-MM-dd HH:mm' }} - {{ cita.pacienteNombre }}
+                  </option>
+                </select>
+                <div *ngIf="cargandoCitas" class="position-absolute top-50 end-0 translate-middle-y me-3">
+                  <div class="spinner-border spinner-border-sm text-primary" role="status">
+                    <span class="visually-hidden">Cargando...</span>
+                  </div>
+                </div>
+              </div>
+              <div class="invalid-feedback" *ngIf="citaId?.invalid && citaId?.touched">
+                <div *ngIf="citaId?.errors?.['required']">
+                  La selección de cita es obligatoria.
+                </div>
+              </div>
+            </div>
+            <div class="col-md-6">
+              <label class="form-label">Medicamento *</label>
+              <div class="position-relative">
+                <select class="form-select" 
+                        formControlName="medicamentoId" 
+                        [class.is-invalid]="medicamentoId?.invalid && medicamentoId?.touched"
+                        [disabled]="cargandoMedicamentos">
+                  <option value="">{{ cargandoMedicamentos ? 'Cargando medicamentos...' : 'Seleccionar medicamento...' }}</option>
+                  <option *ngFor="let medicamento of medicamentosList" [value]="medicamento.id">
+                    {{ medicamento.nombre }}
+                  </option>
+                </select>
+                <div *ngIf="cargandoMedicamentos" class="position-absolute top-50 end-0 translate-middle-y me-3">
+                  <div class="spinner-border spinner-border-sm text-primary" role="status">
+                    <span class="visually-hidden">Cargando...</span>
+                  </div>
+                </div>
+              </div>
+              <div class="invalid-feedback" *ngIf="medicamentoId?.invalid && medicamentoId?.touched">
+                <div *ngIf="medicamentoId?.errors?.['required']">
+                  La selección de medicamento es obligatoria.
+                </div>
+              </div>
+            </div>
+            <div class="col-md-6">
+              <label class="form-label">Dosis *</label>
+              <input type="text" 
+                     class="form-control" 
+                     formControlName="dosis" 
+                     [class.is-invalid]="dosis?.invalid && dosis?.touched"
+                     placeholder="Ej: 1 comprimido cada 8 horas">
+              <div class="invalid-feedback" *ngIf="dosis?.invalid && dosis?.touched">
+                <div *ngIf="dosis?.errors?.['required']">
+                  La dosis es obligatoria.
+                </div>
+                <div *ngIf="dosis?.errors?.['maxlength']">
+                  La dosis no debe exceder los 200 caracteres.
+                </div>
+              </div>
+            </div>
+            <div class="col-12">
+              <label class="form-label">Indicaciones</label>
+              <textarea rows="3" 
+                        class="form-control" 
+                        formControlName="indicaciones" 
+                        [class.is-invalid]="indicaciones?.invalid && indicaciones?.touched"
+                        placeholder="Instrucciones adicionales para el paciente...">
+              </textarea>
+              <div class="invalid-feedback" *ngIf="indicaciones?.invalid && indicaciones?.touched">
+                <div *ngIf="indicaciones?.errors?.['maxlength']">
+                  Las indicaciones no deben exceder los 500 caracteres.
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-secondary" (click)="closeModal()">Cerrar</button>
+          <button type="submit" class="btn btn-primary" [disabled]="form.invalid || guardando">
+            <span *ngIf="guardando" class="spinner-border spinner-border-sm me-2"></span>
+            {{ titleBoton }}
+          </button>
+        </div>
+      </form>
+    </div>
+  </div>
+</div>

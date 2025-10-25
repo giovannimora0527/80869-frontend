@@ -1,0 +1,156 @@
+<div class="container">
+  <div class="card">
+    <div class="card-header">
+      <div class="d-flex justify-content-between align-items-center">
+        <h3 class="mb-0">
+          <i class="fa fa-user-md"></i>
+          &nbsp;Lista de Especializaciones
+        </h3>
+        <button 
+          class="btn btn-outline-primary" 
+          (click)="abrirNuevaEspecializacion()"
+          [disabled]="cargandoEspecializaciones">
+          <span *ngIf="cargandoEspecializaciones" class="spinner-border spinner-border-sm me-2" role="status">
+            <span class="visually-hidden">Cargando...</span>
+          </span>
+          <i *ngIf="!cargandoEspecializaciones" class="fa fa-plus"></i>
+          {{ cargandoEspecializaciones ? 'Cargando...' : 'Nueva Especialización' }}
+        </button>
+      </div>
+    </div>
+
+    <div class="card-body">
+      <!-- Barra de búsqueda flotante y moderna para especializaciones -->
+      <div class="row justify-content-center mb-4">
+        <div class="col-12 col-md-10">
+          <div style="background: #fff; border-radius: 2rem; box-shadow: 0 4px 24px rgba(0,0,0,0.08); padding: 1.2rem 2rem; display: flex; align-items: center; gap: 1rem; flex-wrap: wrap;">
+            <i class="fa fa-user-md fa-lg text-primary"></i>
+            <input type="text" class="form-control border-0 shadow-none" style="background: transparent; font-size: 1.1rem; max-width: 220px;" placeholder="Buscar por nombre..." [(ngModel)]="busquedaNombre" (input)="buscarEspecializaciones()" [disabled]="cargandoEspecializaciones" name="busquedaNombre">
+            <i class="fa fa-code fa-lg text-info"></i>
+            <input type="text" class="form-control border-0 shadow-none" style="background: transparent; font-size: 1.1rem; max-width: 220px;" placeholder="Buscar por código..." [(ngModel)]="busquedaCodigo" (input)="buscarEspecializaciones()" [disabled]="cargandoEspecializaciones" name="busquedaCodigo">
+            <button type="button" class="btn btn-outline-secondary rounded-pill px-3" (click)="limpiarBusqueda()" [disabled]="cargandoEspecializaciones">
+              <i class="fa fa-times"></i>
+            </button>
+            <div *ngIf="cargandoEspecializaciones" class="ms-3">
+              <small class="text-muted d-flex align-items-center">
+                <div class="spinner-border spinner-border-sm me-2" role="status">
+                  <span class="visually-hidden">Cargando...</span>
+                </div>
+                Cargando especializaciones...
+              </small>
+            </div>
+          </div>
+        </div>
+      </div>
+      
+      <div class="table-responsive">
+        <table class="table table-striped table-hover align-middle">
+          <thead>
+            <tr>
+              <th class="sortable-header" (click)="ordenarPor('id')">
+                ID <i [class]="getIconoOrden('id')"></i>
+              </th>
+              <th class="sortable-header" (click)="ordenarPor('codigoEspecializacion')">
+                Código <i [class]="getIconoOrden('codigoEspecializacion')"></i>
+              </th>
+              <th class="sortable-header" (click)="ordenarPor('nombre')">
+                Nombre <i [class]="getIconoOrden('nombre')"></i>
+              </th>
+              <th class="sortable-header" (click)="ordenarPor('descripcion')">
+                Descripción <i [class]="getIconoOrden('descripcion')"></i>
+              </th>
+              <th style="width: 90px;">Acción</th>
+            </tr>
+          </thead>
+          <tbody>
+            <!-- Spinner de carga -->
+            <tr *ngIf="cargandoEspecializaciones">
+              <td colspan="5" class="text-center py-4">
+                <div class="d-flex justify-content-center align-items-center">
+                  <div class="spinner-border text-primary me-2" role="status">
+                    <span class="visually-hidden">Cargando...</span>
+                  </div>
+                  <span class="text-muted">Cargando especializaciones...</span>
+                </div>
+              </td>
+            </tr>
+            
+            <tr *ngFor="let especializacion of especializacionList">
+              <td>{{ especializacion.id }}</td>
+              <td>{{ especializacion.codigoEspecializacion }}</td>
+              <td>{{ especializacion.nombre }}</td>
+              <td>{{ especializacion.descripcion || 'Sin descripción' }}</td>
+              <td>
+                <button type="button"
+                        class="btn btn-outline-primary btn-sm"
+                        title="Editar especialización"
+                        (click)="editarModalEspecializacion(especializacion)">
+                  <i class="fa fa-edit"></i>
+                </button>
+              </td>
+            </tr>
+            
+            <!-- Mensaje cuando no hay datos -->
+            <tr *ngIf="!cargandoEspecializaciones && (!especializacionList || especializacionList.length === 0)">
+              <td colspan="5" class="text-center text-muted py-4">
+                No hay especializaciones registradas.
+              </td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Modal para crear/editar especialización -->
+<div class="modal fade" id="modalCrearEspecializacion" tabindex="-1" aria-labelledby="modalCrearEspecializacionLabel" aria-hidden="true">
+  <div class="modal-dialog modal-lg">
+    <div class="modal-content">
+      <form [formGroup]="form" (ngSubmit)="guardarEspecializacion()">
+        <div class="modal-header">
+          <h1 class="modal-title fs-5" id="modalCrearEspecializacionLabel">{{ titleModal }}</h1>
+          <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close" (click)="closeModal()"></button>
+        </div>
+        <div class="modal-body">
+          <div class="row g-3">
+            <div class="col-md-6">
+              <label class="form-label">Código de Especialización *</label>
+              <input type="text" class="form-control" formControlName="codigoEspecializacion" 
+                     placeholder="Ej: CARD001">
+              <div *ngIf="codigoEspecializacion?.invalid && codigoEspecializacion?.touched" class="text-danger small mt-1">
+                <div *ngIf="codigoEspecializacion?.errors?.['required']">El código es obligatorio.</div>
+                <div *ngIf="codigoEspecializacion?.errors?.['maxlength']">Máximo 10 caracteres.</div>
+                <div *ngIf="codigoEspecializacion?.errors?.['pattern']">Solo letras mayúsculas y números.</div>
+              </div>
+            </div>
+            <div class="col-md-6">
+              <label class="form-label">Nombre *</label>
+              <input type="text" class="form-control" formControlName="nombre" 
+                     placeholder="Ej: Cardiología">
+              <div *ngIf="nombre?.invalid && nombre?.touched" class="text-danger small mt-1">
+                <div *ngIf="nombre?.errors?.['required']">El nombre es obligatorio.</div>
+                <div *ngIf="nombre?.errors?.['maxlength']">Máximo 100 caracteres.</div>
+              </div>
+            </div>
+            <div class="col-12">
+              <label class="form-label">Descripción</label>
+              <textarea rows="3" class="form-control" formControlName="descripcion" 
+                        placeholder="Descripción de la especialización..."></textarea>
+              <div *ngIf="descripcion?.invalid && descripcion?.touched" class="text-danger small mt-1">
+                <div *ngIf="descripcion?.errors?.['maxlength']">Máximo 500 caracteres.</div>
+              </div>
+            </div>
+          </div>
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-secondary" (click)="closeModal()">Cerrar</button>
+          <button type="submit" class="btn btn-primary" [disabled]="form.invalid || guardando">
+            <span *ngIf="guardando" class="spinner-border spinner-border-sm me-2"></span>
+            {{ titleBoton }}
+          </button>
+        </div>
+      </form>
+    </div>
+  </div>
+</div>

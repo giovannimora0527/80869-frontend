@@ -1,0 +1,157 @@
+
+
+<div class="container">
+  <div class="card">
+    <div class="card-header">
+      <div class="d-flex justify-content-between align-items-center">
+        <h3 class="mb-0">
+          <i class="fa fa-user-md"></i>
+          &nbsp;Lista de médicos
+        </h3>
+        <button class="btn btn-outline-primary" (click)="abrirNuevoMedico()">
+          <i class="fa fa-plus"></i>
+          Nuevo médico
+        </button>
+      </div>
+    </div>
+    <div class="card-body">
+      <!-- Barra de búsqueda flotante y moderna para médicos -->
+      <div class="row justify-content-center mb-4">
+        <div class="col-12 col-md-8">
+          <div style="background: #fff; border-radius: 2rem; box-shadow: 0 4px 24px rgba(0,0,0,0.08); padding: 1.2rem 2rem; display: flex; align-items: center; gap: 1rem;">
+            <i class="fa fa-user-md fa-lg text-primary"></i>
+            <input type="text" class="form-control border-0 shadow-none" style="background: transparent; font-size: 1.1rem;" placeholder="Buscar por nombre o documento..." [(ngModel)]="busquedaMedico" (input)="buscarMedicos()" name="busquedaMedico">
+            <button type="button" class="btn btn-outline-secondary rounded-pill px-3" (click)="limpiarBusqueda()">
+              <i class="fa fa-times"></i>
+            </button>
+          </div>
+        </div>
+      </div>
+      <div class="table-responsive">
+        <table class="table table-striped table-hover align-middle">
+          <thead>
+            <tr>
+              <th>Id</th>
+              <th>Tipo de documento</th>
+              <th># documento.</th>
+              <th>Nombres</th>
+              <th>Apellidos</th>
+              <th>Teléfono</th>
+              <th>Registro Profesional</th>
+              <th>Especialidad</th>
+              <th style="width: 90px;">Acción</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr *ngFor="let medico of medicoList">
+              <td>{{ medico.id }}</td>
+              <td>{{ medico.tipoDocumento }}</td>
+              <td>{{ medico.documento }}</td>
+              <td>{{ medico.nombres }}</td>
+              <td>{{ medico.apellidos }}</td>
+              <td>{{ medico.telefono }}</td>
+              <td>{{ medico.registroProfesional }}</td>
+              <td>{{ medico.especializacion?.nombre || 'N/A' }}</td>
+              <td>
+                <button type="button" class="btn btn-outline-primary btn-sm" title="Editar médico"
+                  (click)="editarModalMedico(medico)">
+                  <i class="fa fa-edit"></i>
+                </button>
+              </td>
+            </tr>
+            <tr *ngIf="!medicoList || medicoList.length === 0">
+              <td colspan="9" class="text-center text-muted py-4">
+                No hay médicos registrados.
+              </td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Modal para crear/editar médico -->
+<div class="modal fade" id="modalCrearMedico" tabindex="-1" aria-labelledby="modalCrearMedicoLabel" aria-hidden="true">
+  <div class="modal-dialog modal-lg">
+    <div class="modal-content">
+      <form [formGroup]="form" (ngSubmit)="guardarMedico()" autocomplete="off">
+        <div class="modal-header">
+          <h1 class="modal-title fs-5" id="modalCrearMedicoLabel">{{ titleModal }}</h1>
+          <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close" (click)="closeModal()"></button>
+        </div>
+        <div class="modal-body">
+          <div class="row g-3">
+            <div class="col-md-4">
+              <label class="form-label">Tipo de documento <span class="text-danger">*</span></label>
+              <select class="form-select" formControlName="tipoDocumento">
+                <option value="">Seleccione...</option>
+                <option value="DNI">CC</option>
+                <option value="CE">TI</option>
+                <option value="PAS">CEDULA EXTRANJERA</option>
+              </select>
+              <div *ngIf="form.get('tipoDocumento')?.touched && form.get('tipoDocumento')?.invalid" class="text-danger small">
+                El tipo de documento es requerido.
+              </div>
+            </div>
+            <div class="col-md-4">
+              <label class="form-label">Número de documento <span class="text-danger">*</span></label>
+              <input type="text" class="form-control" formControlName="documento" maxlength="20">
+              <div *ngIf="form.get('documento')?.touched && form.get('documento')?.invalid" class="text-danger small">
+                <span *ngIf="form.get('documento')?.errors?.['required']">El número de documento es requerido.</span>
+                <span *ngIf="form.get('documento')?.errors?.['maxlength']">Máximo 20 caracteres.</span>
+                <span *ngIf="form.get('documento')?.errors?.['pattern']">Solo números.</span>
+              </div>
+            </div>
+            <div class="col-md-4">
+              <label class="form-label">Teléfono</label>
+              <input type="text" class="form-control" formControlName="telefono" maxlength="20">
+              <div *ngIf="form.get('telefono')?.touched && form.get('telefono')?.invalid" class="text-danger small">
+                <span *ngIf="form.get('telefono')?.errors?.['maxlength']">Máximo 20 caracteres.</span>
+                <span *ngIf="form.get('telefono')?.errors?.['pattern']">Solo números.</span>
+              </div>
+            </div>
+            <div class="col-md-6">
+              <label class="form-label">Nombres <span class="text-danger">*</span></label>
+              <input type="text" class="form-control" formControlName="nombres" maxlength="100">
+              <div *ngIf="form.get('nombres')?.touched && form.get('nombres')?.invalid" class="text-danger small">
+                <span *ngIf="form.get('nombres')?.errors?.['required']">El nombre es requerido.</span>
+                <span *ngIf="form.get('nombres')?.errors?.['maxlength']">Máximo 100 caracteres.</span>
+              </div>
+            </div>
+            <div class="col-md-6">
+              <label class="form-label">Apellidos <span class="text-danger">*</span></label>
+              <input type="text" class="form-control" formControlName="apellidos" maxlength="100">
+              <div *ngIf="form.get('apellidos')?.touched && form.get('apellidos')?.invalid" class="text-danger small">
+                <span *ngIf="form.get('apellidos')?.errors?.['required']">El apellido es requerido.</span>
+                <span *ngIf="form.get('apellidos')?.errors?.['maxlength']">Máximo 100 caracteres.</span>
+              </div>
+            </div>
+            <div class="col-md-6">
+              <label class="form-label">Registro Profesional <span class="text-danger">*</span></label>
+              <input type="text" class="form-control" formControlName="registroProfesional" maxlength="50">
+              <div *ngIf="form.get('registroProfesional')?.touched && form.get('registroProfesional')?.invalid" class="text-danger small">
+                <span *ngIf="form.get('registroProfesional')?.errors?.['required']">El registro profesional es requerido.</span>
+                <span *ngIf="form.get('registroProfesional')?.errors?.['maxlength']">Máximo 50 caracteres.</span>
+              </div>
+            </div>
+            <div class="col-md-6">
+              <label class="form-label">Especialización <span class="text-danger">*</span></label>
+              <select class="form-select" formControlName="especializacionId">
+                <option value="">Seleccione...</option>
+                <option *ngFor="let esp of especializacionList" [value]="esp.id">{{ esp.nombre }}</option>
+              </select>
+              <div *ngIf="form.get('especializacionId')?.touched && form.get('especializacionId')?.invalid" class="text-danger small">
+                La especialización es requerida.
+              </div>
+            </div>
+          </div>
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-secondary" (click)="closeModal()">Cerrar</button>
+          <button type="submit" class="btn btn-primary" [disabled]="form.invalid">{{ titleBoton }}</button>
+        </div>
+      </form>
+    </div>
+  </div>
+</div>

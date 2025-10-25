@@ -1,0 +1,144 @@
+<div class="container">
+  <div class="card">
+    <div class="card-header">
+      <div class="d-flex justify-content-between align-items-center">
+        <h3 class="mb-0">
+          <i class="fa fa-calendar"></i>
+          &nbsp;Lista de citas
+        </h3>
+        <button class="btn btn-outline-primary" (click)="abrirNuevaCita()">
+          <i class="fa fa-plus"></i>
+          Nueva cita
+        </button>
+      </div>
+    </div>
+
+    <div class="card-body">
+      <div class="table-responsive">
+        <table class="table table-striped table-hover align-middle">
+          <thead>
+            <tr>
+              <th>ID</th>
+              <th>Paciente</th>
+              <th>Médico</th>
+              <th>Fecha y Hora</th>
+              <th>Estado</th>
+              <th>Motivo</th>
+              <th style="width: 90px;">Acción</th>
+            </tr>
+          </thead>
+          <tbody>
+            <!-- Itera sobre citasList para mostrar las citas -->
+            <tr *ngFor="let cita of citasList">
+              <td>{{ cita.id }}</td>
+              <td>{{ cita.nombreCompletoPaciente || 'Sin asignar' }}</td>
+              <td>{{ cita.nombreCompletoMedico || 'Sin asignar' }}</td>
+              <td>
+                <!-- Formatea la fecha y hora usando Angular Date Pipe -->
+                {{ cita.fechaHora | date:'yyyy-MM-dd HH:mm' }}
+              </td>
+              <td>{{ cita.estado }}</td>
+              <td>{{ cita.motivo || 'Sin motivo' }}</td>
+              <td>
+                <button type="button"
+                        class="btn btn-outline-primary btn-sm"
+                        title="Editar cita"
+                        (click)="editarModalCita(cita)">
+                  <i class="fa fa-edit"></i>
+                </button>
+              </td>
+            </tr>
+            <!-- Muestra un mensaje si no hay citas registradas -->
+            <tr *ngIf="!citasList || citasList.length === 0">
+              <td colspan="7" class="text-center text-muted py-4">
+                No hay citas registradas.
+              </td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Modal Crear/Editar Cita -->
+<div class="modal fade" id="modalCrearCita" tabindex="-1" aria-labelledby="modalCrearCitaLabel" aria-hidden="true">
+  <div class="modal-dialog modal-lg">
+    <div class="modal-content">
+
+      <!-- Usa el formulario reactivo y envía con (ngSubmit) -->
+      <form [formGroup]="form" (ngSubmit)="guardarCita()">
+        <div class="modal-header">
+          <h1 class="modal-title fs-5" id="modalCrearCitaLabel">{{ titleModal }}</h1>
+          <button type="button"
+                  class="btn-close"
+                  data-bs-dismiss="modal"
+                  aria-label="Close"
+                  (click)="closeModal()"></button>
+        </div>
+
+        <div class="modal-body">
+          <div class="row g-3">
+            <div class="col-md-6">
+              <label class="form-label">Paciente ID</label>
+              <input type="number" class="form-control" formControlName="pacienteId" [readonly]="form.get('pacienteId')?.disabled" placeholder="Ej: 1">
+              <div class="text-danger small"
+                   *ngIf="form.get('pacienteId')?.touched && form.get('pacienteId')?.invalid">
+                Este campo es obligatorio.
+              </div>
+            </div>
+
+            <div class="col-md-6">
+              <label class="form-label">Médico ID</label>
+              <input type="number" class="form-control" formControlName="medicoId" placeholder="Ej: 3">
+              <div class="text-danger small"
+                   *ngIf="form.get('medicoId')?.touched && form.get('medicoId')?.invalid">
+                Este campo es obligatorio.
+              </div>
+            </div>
+
+            <div class="col-md-6">
+              <label class="form-label">Fecha y hora</label>
+              <input type="datetime-local" class="form-control" formControlName="fechaHora">
+              <div class="text-danger small"
+                   *ngIf="form.get('fechaHora')?.touched && form.get('fechaHora')?.invalid">
+                Este campo es obligatorio.
+              </div>
+            </div>
+
+            <div class="col-md-6">
+              <label class="form-label">Estado</label>
+              <select class="form-select" formControlName="estado">
+                <option value="PENDIENTE">PENDIENTE</option>
+                <option value="CONFIRMADA">CONFIRMADA</option>
+                <option value="CANCELADA">CANCELADA</option>
+                <option value="ATENDIDA">ATENDIDA</option>
+              </select>
+            </div>
+
+            <div class="col-12">
+              <label class="form-label">Motivo</label>
+              <textarea rows="3" class="form-control" formControlName="motivo"
+                        placeholder="Motivo (opcional)"></textarea>
+            </div>
+          </div>
+        </div>
+
+        <div class="modal-footer">
+          <button type="button"
+                  class="btn btn-secondary"
+                  (click)="closeModal()"
+                  [disabled]="guardando">
+            Cerrar
+          </button>
+
+          <button type="submit"
+                  class="btn btn-primary"
+                  [disabled]="guardando || form.invalid">
+            {{ guardando ? 'Guardando...' : titleBoton }}
+          </button>
+        </div>
+      </form>
+    </div>
+  </div>
+</div>
