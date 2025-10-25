@@ -25,10 +25,11 @@
                         <tr>
                             <th>Id</th>
                             <th>Cita ID</th>
-                            <th>Paciente</th> 
+                            
                             <th>Medicamento</th> 
                             <th>Dosis</th>
                             <th>Indicaciones</th>
+                            <th>Fecha de creación registro</th>
                             <th>Acciones</th>
                         </tr>
                     </thead>
@@ -36,10 +37,11 @@
                         <tr *ngFor="let receta of recetaList">
                             <td>{{ receta.id }}</td>
                             <td>{{ receta.citaId }}</td> 
-                            <td>[Nombre Paciente]</td>
-                            <td>[Nombre Medicamento]</td>
+                   
+                            <td>{{ receta.medicamentoId }}</td>
                             <td>{{ receta.dosis }}</td>
                             <td>{{ receta.indicaciones }}</td>
+                            <td>{{ receta.fechaCreacionRegistro | date:'dd/MM/yyyy' }}</td>
                             <td>
                                 <button class="btn btn-outline-primary" (click)="editarModalReceta(receta)">
                                     <i class="fa fa-edit"></i>
@@ -77,8 +79,15 @@
                                 <label for="citaId" class="form-label">Cita Asociada</label>
                                 <select formControlName="citaId" class="form-select" id="citaId">
                                     <option [ngValue]="null" disabled selected>Seleccione la cita</option>
-                                    <option [ngValue]="1">Cita ID 1 (Paciente X)</option>
-                                    <option [ngValue]="2">Cita ID 2 (Paciente Y)</option>
+                                    <option [ngValue]="1">Cita ID 1 </option>
+                                    <option [ngValue]="2">Cita ID 2 </option>
+                                    <option [ngValue]="3">Cita ID 3 </option>
+                                    <option [ngValue]="4">Cita ID 4 </option>
+                                    <option [ngValue]="5">Cita ID 5 </option>
+                                    <option [ngValue]="6">Cita ID 6 </option>
+                                    <option [ngValue]="7">Cita ID 7 </option>
+                                    <option [ngValue]="8">Cita ID 8 </option>
+
                                 </select>
                                 <div *ngIf="f['citaId']?.errors?.['required'] && f['citaId'].touched" class="text-danger">
                                     La cita es requerida.
@@ -89,8 +98,11 @@
                                 <label for="medicamentoId" class="form-label">Medicamento</label>
                                 <select formControlName="medicamentoId" class="form-select" id="medicamentoId">
                                     <option [ngValue]="null" disabled selected>Seleccione el medicamento</option>
-                                    <option [ngValue]="1">Medicamento ID 1 (Paracetamol)</option>
+                                    <option [ngValue]="1"> Medicamento ID 1 (Paracetamol)</option>
                                     <option [ngValue]="2">Medicamento ID 2 (Amoxicilina)</option>
+                                    <option [ngValue]="3">Medicamento ID 3 (Ibuproféno)</option>
+                                    <option [ngValue]="4">Medicamento ID 4 (Diclofenalco)</option>
+                                    <option [ngValue]="5">Medicamento ID 5 (Tiamnina)</option>
                                 </select>
                                 <div *ngIf="f['medicamentoId']?.errors?.['required'] && f['medicamentoId'].touched" class="text-danger">
                                     El medicamento es requerido.
@@ -108,6 +120,13 @@
                             <div class="mb-3">
                                 <label for="indicaciones" class="form-label">Indicaciones Adicionales</label>
                                 <textarea formControlName="indicaciones" class="form-control" id="indicaciones" placeholder="Indicaciones sobre la toma del medicamento"></textarea>
+                            </div>                            
+                            <div class="mb-3">
+                                <label for="fechaCreacionRegistro" class="form-label">Fecha de Creación</label>
+                                <input type="date" formControlName="fechaCreacionRegistro" class="form-control" id="fechaCreacionRegistro" />
+                                <div *ngIf="f['fechaCreacionRegistro']?.errors?.['required'] && f['fechaCreacionRegistro'].touched" class="text-danger">
+                                    La fecha de creación es requerida.
+                                </div>
                             </div>
                         </form>
                     </div>

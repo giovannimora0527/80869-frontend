@@ -23,6 +23,6 @@ export class RecetasService {
   }
   
   actualizarReceta(receta: Receta): Observable<RespuestRs> {
-    return this.backendService.put(this.apiUrl, this.endpoint, 'actualizar', receta);
+    return this.backendService.post(this.apiUrl, this.endpoint, 'actualizar', receta);
   }
 }

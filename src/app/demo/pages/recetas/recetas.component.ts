@@ -54,10 +54,11 @@ export class RecetasComponent implements OnInit {
   inicializarFormulario() {
     this.form = this.formBuilder.group({
       id: [null],
-      citaId: [null, [Validators.required]],        
+      citaId: [null, [Validators.required]],        
       medicamentoId: [null, [Validators.required]], 
       dosis: ['', [Validators.required, Validators.maxLength(100)]],
-      indicaciones: ['', [Validators.maxLength(500)]]
+      indicaciones: ['', [Validators.maxLength(500)]],
+      fechaCreacionRegistro: [new Date()]
     });
   }
 
@@ -143,6 +144,7 @@ export class RecetasComponent implements OnInit {
   abrirRecetaModal() { 
     this.limpiarFormulario();
     this.openModal('C'); 
+    
   }
 
   editarModalReceta(receta: Receta) { 
@@ -154,7 +156,9 @@ export class RecetasComponent implements OnInit {
       medicamentoId: receta.medicamentoId,
       dosis: receta.dosis,
       indicaciones: receta.indicaciones,
+      fechaCreacionRegistro: receta.fechaCreacionRegistro
     });
     this.openModal('E'); 
   }
+
 }
