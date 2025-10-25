@@ -152,8 +152,8 @@ export class RecetasComponent implements OnInit {
     
     this.form.patchValue({
       id: receta.id,
-      citaId: receta.citaId, 
-      medicamentoId: receta.medicamentoId,
+      citaId: receta.cita?.id, 
+      medicamentoId: receta.medicamento?.id,
       dosis: receta.dosis,
       indicaciones: receta.indicaciones,
       fechaCreacionRegistro: receta.fechaCreacionRegistro

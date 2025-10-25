@@ -36,9 +36,9 @@
                     <tbody *ngIf="recetaList && recetaList.length > 0">
                         <tr *ngFor="let receta of recetaList">
                             <td>{{ receta.id }}</td>
-                            <td>{{ receta.citaId }}</td> 
+                            <td>{{ receta.cita?.id }}</td> 
                    
-                            <td>{{ receta.medicamentoId }}</td>
+                            <td>{{ receta.medicamento?.nombre }}</td>
                             <td>{{ receta.dosis }}</td>
                             <td>{{ receta.indicaciones }}</td>
                             <td>{{ receta.fechaCreacionRegistro | date:'dd/MM/yyyy' }}</td>
