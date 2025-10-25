@@ -21,9 +21,6 @@
               <th>Nombre</th>
               <th>Descripción</th>
               <th>Presentación</th>
-              <th>Concentración</th>
-              <th>Stock</th>
-              <th>Precio</th>
               <th>Acciones</th>
             </tr>
           </thead>
@@ -33,11 +30,8 @@
               <td>{{ medicamento.nombre }}</td>
               <td>{{ medicamento.descripcion }}</td>
               <td>{{ medicamento.presentacion }}</td>
-              <td>{{ medicamento.concentracion }}</td>
-              <td>{{ medicamento.stock }}</td>
-              <td>{{ medicamento.precio | currency:'COP':'symbol-narrow' }}</td>
               <td>
-                <button class="btn btn-outline-primary" (click)="editarModalMedicamento(medicamento)">
+                <button class="btn btn-outline-primary btn-sm" (click)="editarModalMedicamento(medicamento)">
                   <i class="fa fa-edit"></i>&nbsp;Editar
                 </button>
               </td>
@@ -45,7 +39,7 @@
           </tbody>
           <tbody *ngIf="medicamentoList.length === 0">
             <tr>
-              <td colspan="8" class="text-center">No hay medicamentos disponibles.</td>
+              <td colspan="5" class="text-center">No hay medicamentos disponibles.</td>
             </tr>
           </tbody>
         </table>
