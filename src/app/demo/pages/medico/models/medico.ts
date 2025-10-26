@@ -1,6 +1,11 @@
-import { Especializacion } from "src/app/demo/pages/especializacion/models/especializacion";
+export interface Especializacion {
+  id: number;
+  nombre: string;
+  descripcion?: string;
+  codigo?: string;
+}
 
-
+// Tipo para recibir datos del backend
 export class Medico {
   id!: number;
   tipoDocumento!: string;
@@ -9,5 +14,18 @@ export class Medico {
   apellidos!: string;
   telefono!: string;
   registroProfesional!: string;
-  especializacion!: Especializacion;
+  especializacionId!: number;
+  especializacion!: Especializacion;  // Objeto completo de especialización
+}
+
+// Tipo para enviar datos al backend (sin el objeto especialización completo)
+export interface MedicoRequest {
+  id?: number;
+  tipoDocumento: string;
+  documento: string;
+  nombres: string;
+  apellidos: string;
+  telefono?: string;
+  registroProfesional: string;
+  especializacionId: number;
 }
