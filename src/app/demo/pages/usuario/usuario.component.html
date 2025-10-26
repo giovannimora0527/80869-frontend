@@ -1,8 +1,72 @@
-<ngx-spinner type="ball-fussion" size="medium" color="#fff">
-  <p>{{titleSpinner}}</p>
-</ngx-spinner>
-
 <div class="container">
+  <!-- Barra de búsqueda flotante y moderna -->
+  <div class="row justify-content-center mb-4">
+    <div class="col-12 col-md-7">
+      <div style="background: #fff; border-radius: 2rem; box-shadow: 0 4px 24px rgba(0,0,0,0.08); padding: 1.2rem 2rem; display: flex; align-items: center; gap: 1rem;">
+        <i class="fa fa-search fa-lg text-primary"></i>
+        <input type="text" class="form-control border-0 shadow-none" style="background: transparent; font-size: 1.1rem;" placeholder="Buscar usuario por nombre..." [(ngModel)]="nombreBusqueda" name="nombreBusqueda">
+        <button type="button" class="btn btn-primary rounded-pill px-4" (click)="buscarPorNombre()">
+          <i class="fa fa-search"></i> Buscar
+        </button>
+      </div>
+    </div>
+  </div>
+  <!-- Filtros de rol y estado en tarjetas pequeñas -->
+  <div class="row mb-4 justify-content-center g-3">
+    <div class="col-12 col-md-3">
+      <div style="background: #f5f7fa; border-radius: 1rem; box-shadow: 0 2px 8px rgba(0,0,0,0.04); padding: 1.2rem; display: flex; align-items: center; gap: 0.7rem;">
+        <i class="fa fa-user-tag fa-lg text-info"></i>
+        <select class="form-select border-0 bg-transparent" style="font-size: 1.05rem;" [(ngModel)]="rolSeleccionado" (change)="filtrarPorRol()" name="rolSeleccionado">
+          <option value="">Todos los roles</option>
+          <option value="ADMIN">ADMIN</option>
+          <option value="MEDICO">MEDICO</option>
+          <option value="PACIENTE">PACIENTE</option>
+        </select>
+      </div>
+    </div>
+    <div class="col-12 col-md-3">
+      <div style="background: #f5f7fa; border-radius: 1rem; box-shadow: 0 2px 8px rgba(0,0,0,0.04); padding: 1.2rem; display: flex; align-items: center; gap: 0.7rem;">
+        <i class="fa fa-toggle-on fa-lg text-success"></i>
+        <select class="form-select border-0 bg-transparent" style="font-size: 1.05rem;" [(ngModel)]="estadoSeleccionado" (change)="filtrarPorEstado()" name="estadoSeleccionado">
+          <option value="">Todos</option>
+          <option [ngValue]="1">Activos</option>
+          <option [ngValue]="0">Inactivos</option>
+        </select>
+      </div>
+    </div>
+  </div>
+  <!-- Filtros de rol y estado en tarjetas separadas -->
+  <div class="row mb-4 justify-content-center">
+    <div class="col-12 col-md-4 mb-2 mb-md-0">
+      <div class="card shadow-sm border-0">
+        <div class="card-body py-3">
+          <div class="input-group">
+            <span class="input-group-text bg-white"><i class="fa fa-user-tag"></i></span>
+            <select class="form-select" [(ngModel)]="rolSeleccionado" (change)="filtrarPorRol()" name="rolSeleccionado">
+              <option value="">Todos los roles</option>
+              <option value="ADMIN">ADMIN</option>
+              <option value="MEDICO">MEDICO</option>
+              <option value="PACIENTE">PACIENTE</option>
+            </select>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="col-12 col-md-4">
+      <div class="card shadow-sm border-0">
+        <div class="card-body py-3">
+          <div class="input-group">
+            <span class="input-group-text bg-white"><i class="fa fa-toggle-on"></i></span>
+            <select class="form-select" [(ngModel)]="estadoSeleccionado" (change)="filtrarPorEstado()" name="estadoSeleccionado">
+              <option value="">Todos</option>
+              <option [ngValue]="1">Activos</option>
+              <option [ngValue]="0">Inactivos</option>
+            </select>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
   <div class="card">
     <div class="card-header">
       <div class="d-flex justify-content-between align-items-center">
@@ -101,17 +165,19 @@
                     <i class="fa" style="margin-left: 10px" [ngClass]="mostrarPassword ? 'fa-eye-slash' : 'fa-eye'"></i>
                   </button>
                 </div>
-                <div *ngIf="form.get('password')?.hasError('required') && form.get('password')?.touched" class="text-danger">
+              
+                <div *ngIf="form.get('password')?.hasError('required') && form.get('password')?.touched && modoFormulario === 'C'" class="text-danger">
                   La contraseña es requerida.
                 </div>
-                <div *ngIf="form.get('password')?.hasError('minlength') && form.get('password')?.touched" class="text-danger">
+        
+                <div *ngIf="form.get('password')?.hasError('minlength') && form.get('password')?.touched && form.get('password')?.value" class="text-danger">
                   La contraseña debe ser al menos de 8 caracteres.
                 </div>
-                <div *ngIf="form.get('password')?.hasError('maxlength') && form.get('password')?.touched" class="text-danger">
+                <div *ngIf="form.get('password')?.hasError('maxlength') && form.get('password')?.touched && form.get('password')?.value" class="text-danger">
                   La contraseña debe ser máximo de 16 caracteres.
                 </div>
               </div>
-              <!--  Rol del usuario -->
+       
               <div class="mb-3">
                 <label for="rol" class="form-label">Rol</label>
                 <select formControlName="rol" class="form-control" id="rol" [ngModel]="usuarioSelected?.rol || ''">
@@ -125,7 +191,7 @@
                 </div>
               </div>
 
-              <!--  Estado del usuario -->
+      
               <div class="mb-3" *ngIf="modoFormulario === 'E'">
                 <label for="activo" class="form-label">Estado</label>
                 <select formControlName="activo" class="form-control" id="activo" [ngModel]="usuarioSelected?.activo || false">
