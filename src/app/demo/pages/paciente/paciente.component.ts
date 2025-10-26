@@ -2,75 +2,98 @@ import { Component } from '@angular/core';
 import { PacienteService } from './service/paciente.service';
 import { Paciente } from './models/paciente';
 import { CommonModule } from '@angular/common';
+import { FormsModule } from '@angular/forms';
 
-// Import library module
-import { NgxSpinnerModule, NgxSpinnerService } from 'ngx-spinner';
-
-import Swal from 'sweetalert2';
 // Importa los objetos necesarios de Bootstrap
 import Modal from 'bootstrap/js/dist/modal';
-
-import { FormBuilder, FormGroup, Validators, AbstractControl, FormsModule, ReactiveFormsModule } from '@angular/forms';
+import Swal from 'sweetalert2';
 
 @Component({
   selector: 'app-paciente',
-  imports: [CommonModule, FormsModule, ReactiveFormsModule, NgxSpinnerModule],
+  imports: [CommonModule, FormsModule],
   templateUrl: './paciente.component.html',
   styleUrl: './paciente.component.scss'
 })
 export class PacienteComponent {
+  /**
+   * Variables para el modal.
+   */
   modalInstance: Modal | null = null;
   modoFormulario: string = '';
-  pacientes: Paciente[] = [];
-  pacientesOriginal: Paciente[] = []; // Guarda la lista original filtros*
-  pacientesFiltrados: Paciente[] = []; // Lista filtrada para mostrar filtros*
   titleModal: string = '';
   titleBoton: string = '';
-  pacienteSelected: Paciente;
-  titleSpinner: string = "Cargando...";
+  pacienteSelected: Paciente = new Paciente();
 
-  form: FormGroup;
+  /**
+   * Variables para la tabla de datos o datatable.
+   */
+  pacienteList: Paciente[] = [];
+  pacienteListOriginal: Paciente[] = []; // Lista original sin filtrar
+  pacienteListFiltrada: Paciente[] = []; // Lista filtrada para mostrar
 
-  constructor(
-    private readonly pacienteService: PacienteService,
-    private readonly formBuilder: FormBuilder,
-    private readonly spinner: NgxSpinnerService
+  /**
+   * Variables para búsqueda
+   */
+  busquedaNombre: string = '';
+  busquedaDocumento: string = '';
 
-  ) {
+  /**
+   * Variable para controlar el estado de guardado
+   */
+  guardando = false;
+
+  /**
+   * Variables para filtros
+   */
+  filtros = {
+    id: '',
+    tipoDocumento: '',
+    numeroDocumento: '',
+    nombres: '',
+    apellidos: '',
+    fechaNacimiento: '',
+    genero: '',
+    telefono: '',
+    direccion: ''
+  };
+
+  /**
+   * Variables para ordenamiento
+   */
+  ordenActual = {
+    campo: '',
+    direccion: 'asc' // 'asc' o 'desc'
+  };
+
+  /**
+   * Opciones para los selects
+   */
+  tiposDocumento = [
+    { value: 'CC', label: 'Cédula de Ciudadanía' },
+    { value: 'TI', label: 'Tarjeta de Identidad' },
+    { value: 'CE', label: 'Cédula de Extranjería' },
+    { value: 'PP', label: 'Pasaporte' }
+  ];
+
+  generosDisponibles = [
+    { value: 'M', label: 'Masculino' },
+    { value: 'F', label: 'Femenino' },
+    { value: 'O', label: 'Otro' }
+  ];
+
+  constructor(private readonly pacienteService: PacienteService) {
     this.listarPacientes();
-    this.inicializarFormulario();
-  }
-
-  inicializarFormulario() {
-    this.form = this.formBuilder.group({
-      usuarioId: ['', [Validators.required]],
-      tipoDocumento: ['', [Validators.required]],
-      numeroDocumento: ['', [Validators.required, Validators.minLength(6), Validators.maxLength(20)]],
-      nombres: ['', [Validators.required, Validators.minLength(2), Validators.maxLength(100)]],
-      apellidos: ['', [Validators.required, Validators.minLength(2), Validators.maxLength(100)]],
-      fechaNacimiento: ['', [Validators.required]],
-      genero: ['', [Validators.required]],
-      telefono: ['', [Validators.required, Validators.pattern(/^[0-9]{10}$/)]],
-      direccion: ['', [Validators.required, Validators.minLength(5), Validators.maxLength(200)]]
-    });
-  }
-
-  get f(): { [key: string]: AbstractControl } {
-    return this.form.controls;
   }
 
   listarPacientes() {
-    this.spinner.show();
-    this.pacienteService.listarPaciente().subscribe({
+    this.pacienteService.listarPacientes().subscribe({
       next: (data) => {
-        this.pacientes = data;
-        this.pacientesFiltrados = [...data];//filtros*
-        console.log('Pacientes:', this.pacientes);
-        this.spinner.hide();
+        this.pacienteListOriginal = data;
+        this.pacienteList = [...data]; // Copia para mostrar       
       },
       error: (error) => {
-        console.error('Error al listar pacientes', error);
-        this.spinner.hide();
+        console.error('Error fetching paciente list:', error);
+        Swal.fire('Error', 'No se pudieron cargar los pacientes.', 'error');
       }
     });
   }
@@ -79,7 +102,6 @@ export class PacienteComponent {
     if (this.modalInstance) {
       this.modalInstance.hide();
     }
-    this.limpiarFormulario();
   }
 
   openModal(modo: string) {
@@ -95,170 +117,224 @@ export class PacienteComponent {
   }
 
   abrirNuevoPaciente() {
-    this.pacienteSelected = null;
+    this.pacienteSelected = new Paciente();
     this.openModal('C');
   }
 
-  abrirEditarPaciente(paciente: Paciente) {
-    this.pacienteSelected = paciente;
+  editarModalPaciente(paciente: Paciente) {
+    this.pacienteSelected = { ...paciente }; // Crear una copia para evitar modificar directamente
+    
+    // ✅ CORRECCIÓN: Formatear fecha para el input date (solo fecha, sin hora)
+    if (this.pacienteSelected.fechaNacimiento) {
+      // Extraer solo la parte de la fecha (YYYY-MM-DD)
+      this.pacienteSelected.fechaNacimiento = this.pacienteSelected.fechaNacimiento.split('T')[0];
+    }
+    
+    console.log('Paciente a editar:', paciente);
     this.openModal('E');
   }
 
-  /**
-   * Funcion que permite guardar/actualizar un paciente.
-   */
   guardarPaciente() {
-    this.titleSpinner = this.modoFormulario === 'C' ? "Creando paciente..." : "Actualizando paciente...";
-    this.spinner.show();
-    if (this.modoFormulario === 'C') {
-      this.form.get('activo')?.setValue(true);
-    }
-    if (this.form.invalid) {
-      // Manejar el formulario inválido
-      this.spinner.hide();
-      Swal.fire('Error', 'Por favor, corrige los errores en el formulario.', 'error');
+    if (!this.validarFormulario()) {
       return;
     }
 
+    this.guardando = true;
+    // Formatear la fecha antes de enviar
+    const pacienteParaEnviar = { ...this.pacienteSelected };
+    
+    // ✅ CORRECCIÓN: Formatear fecha para el backend
+    if (pacienteParaEnviar.fechaNacimiento) {
+      // Si la fecha no tiene hora, agregarla
+      if (!pacienteParaEnviar.fechaNacimiento.includes('T')) {
+        pacienteParaEnviar.fechaNacimiento = pacienteParaEnviar.fechaNacimiento + 'T00:00:00';
+      }
+    }
+    
     if (this.modoFormulario === 'C') {
-      // Modo Creación
-      this.pacienteService.guardarPaciente(this.form.getRawValue()).subscribe({
-        next: (data) => {
-          if (data.status === 200) {
-            this.spinner.hide();
-            Swal.fire('Éxito', data.mensaje, 'success');
-            this.closeModal();
-            this.listarPacientes();
-          } else {
-            this.spinner.hide();
-            Swal.fire('Error', data.mensaje, 'error');
+      // Crear nuevo paciente
+      this.pacienteService.guardarPaciente(pacienteParaEnviar).subscribe({
+        next: (response) => {
+          Swal.fire('Éxito', 'El paciente se ha creado correctamente.', 'success');
+          this.listarPacientes(); // Recargar la lista
+          this.closeModal();
+        },
+        error: (error) => {
+          console.error('Error al crear paciente:', error);
+          const msg = error?.error?.message || error?.error || 'Error al crear el paciente. Verifique los datos e intente nuevamente.';
+          Swal.fire('Error', msg, 'error');
+        },
+        complete: () => {
+          this.guardando = false;
+        }
+      });
+    } else if (this.modoFormulario === 'E') {
+      // Actualizar paciente existente
+      this.pacienteService.actualizarPaciente(pacienteParaEnviar).subscribe({
+        next: (response) => {
+          Swal.fire('Éxito', 'El paciente se ha actualizado correctamente.', 'success');
+          this.listarPacientes(); // Recargar la lista
+          this.closeModal();
+        },
+        error: (error) => {
+          console.error('Error al actualizar paciente:', error);
+          const msg = error?.error?.message || error?.error || 'Error al actualizar el paciente. Verifique los datos e intente nuevamente.';
+          Swal.fire('Error', msg, 'error');
+        },
+        complete: () => {
+          this.guardando = false;
+        }
+      });
+    }
+  }
+
+  private validarFormulario(): boolean {
+    if (!this.pacienteSelected.tipoDocumento || !this.pacienteSelected.numeroDocumento || 
+        !this.pacienteSelected.nombres || !this.pacienteSelected.apellidos || 
+        !this.pacienteSelected.fechaNacimiento || !this.pacienteSelected.genero) {
+      Swal.fire('Error', 'Por favor complete todos los campos obligatorios.', 'error');
+      return false;
+    }
+    return true;
+  }
+
+  buscarPorDocumento() {
+    if (this.pacienteSelected.numeroDocumento) {
+      this.pacienteService.buscarPorDocumento(this.pacienteSelected.numeroDocumento).subscribe({
+        next: (paciente) => {
+          if (paciente) {
+            console.log('Paciente encontrado:', paciente);
+            Swal.fire('Éxito', 'Paciente encontrado correctamente.', 'success');
+            // Aquí puedes hacer algo con el paciente encontrado
           }
         },
         error: (error) => {
-          this.spinner.hide();
-          Swal.fire('Error', error.error.message, 'error');
+          console.error('Paciente no encontrado:', error);
+          Swal.fire('Información', 'No se encontró un paciente con ese número de documento.', 'info');
         }
       });
     } else {
-      // Modo Edición
-      const pacienteActualizado: Paciente = this.form.getRawValue();
-      pacienteActualizado.id = this.pacienteSelected.id;
-      this.pacienteService.actualizarPaciente(pacienteActualizado).subscribe({
-        next: (data) => {
-          if (data.status === 200) {
-            this.spinner.hide();
-            Swal.fire('Éxito', data.mensaje, 'success');
-            this.closeModal();
-            this.listarPacientes();
-          } else {
-            this.spinner.hide();
-            Swal.fire('Error', data.mensaje, 'error');
-          }
-        },
-        error: (error) => {
-          this.spinner.hide();
-          Swal.fire('Error', error.error.message, 'error');
-        }
-      });
+      Swal.fire('Error', 'Por favor ingrese un número de documento.', 'error');
     }
   }
 
-  limpiarFormulario() {
-    this.form.reset({
-      usuarioId: this.pacienteSelected ? this.pacienteSelected.usuarioId : '',
-      tipoDocumento: this.pacienteSelected ? this.pacienteSelected.tipoDocumento : '',
-      numeroDocumento: this.pacienteSelected ? this.pacienteSelected.numeroDocumento : '',
-      nombres: this.pacienteSelected ? this.pacienteSelected.nombres : '',
-      apellidos: this.pacienteSelected ? this.pacienteSelected.apellidos : '',
-      fechaNacimiento: this.pacienteSelected ? this.pacienteSelected.fechaNacimiento : '',
-      genero: this.pacienteSelected ? this.pacienteSelected.genero : '',
-      telefono: this.pacienteSelected ? this.pacienteSelected.telefono : '',
-      direccion: this.pacienteSelected ? this.pacienteSelected.direccion : ''
+  /**
+   * Métodos para filtros y ordenamiento
+   */
+  aplicarFiltros() {
+    this.pacienteListFiltrada = this.pacienteList.filter(paciente => {
+      return (
+        paciente.id.toString().toLowerCase().includes(this.filtros.id.toLowerCase()) &&
+        paciente.tipoDocumento.toLowerCase().includes(this.filtros.tipoDocumento.toLowerCase()) &&
+        paciente.numeroDocumento.toLowerCase().includes(this.filtros.numeroDocumento.toLowerCase()) &&
+        paciente.nombres.toLowerCase().includes(this.filtros.nombres.toLowerCase()) &&
+        paciente.apellidos.toLowerCase().includes(this.filtros.apellidos.toLowerCase()) &&
+        (paciente.fechaNacimiento ? paciente.fechaNacimiento.toString().includes(this.filtros.fechaNacimiento) : true) &&
+        paciente.genero.toLowerCase().includes(this.filtros.genero.toLowerCase()) &&
+        (paciente.telefono ? paciente.telefono.toLowerCase().includes(this.filtros.telefono.toLowerCase()) : true) &&
+        (paciente.direccion ? paciente.direccion.toLowerCase().includes(this.filtros.direccion.toLowerCase()) : true)
+      );
     });
-    this.form.markAsPristine();
-    this.form.markAsUntouched();
-  }
-//filtros*
- filtrarTabla(event: Event) {
-  const input = event.target as HTMLInputElement;
-  const texto = input.value.toLowerCase().trim();
-  
-  if (!texto) {
-    this.pacientesFiltrados = [...this.pacientes];
-    return;
   }
 
-  this.pacientesFiltrados = this.pacientes.filter(paciente => 
-    paciente.id.toString().includes(texto) ||
-    paciente.usuarioId.toString().includes(texto) ||
-    (paciente.tipoDocumento && paciente.tipoDocumento.toLowerCase().includes(texto)) ||
-    (paciente.numeroDocumento && paciente.numeroDocumento.toLowerCase().includes(texto)) ||
-    (paciente.nombres && paciente.nombres.toLowerCase().includes(texto)) ||
-    (paciente.apellidos && paciente.apellidos.toLowerCase().includes(texto)) ||
-    (paciente.fechaNacimiento && paciente.fechaNacimiento.includes(texto)) ||
-    (paciente.genero && paciente.genero.toLowerCase().includes(texto)) ||
-    (paciente.telefono && paciente.telefono.includes(texto)) ||
-    (paciente.direccion && paciente.direccion.toLowerCase().includes(texto))
-  );
-}
-
-// Filtro por campo específico
-filtrarPorCampo(campo: keyof Paciente, event: Event) {
-  const select = event.target as HTMLSelectElement;
-  const valor = select.value;
-  
-  if (!valor) {
-    this.pacientesFiltrados = [...this.pacientes];
-    return;
+  limpiarFiltros() {
+    this.filtros = {
+      id: '',
+      tipoDocumento: '',
+      numeroDocumento: '',
+      nombres: '',
+      apellidos: '',
+      fechaNacimiento: '',
+      genero: '',
+      telefono: '',
+      direccion: ''
+    };
+    this.aplicarFiltros();
   }
 
-  this.pacientesFiltrados = this.pacientes.filter(paciente => 
-    paciente[campo] === valor
-  );
-}
-
-// Ordenar la tabla
-ordenarTabla(event: Event) {
-  const select = event.target as HTMLSelectElement;
-  const criterio = select.value;
-  
-  if (!criterio) {
-    this.pacientesFiltrados = [...this.pacientes];
-    return;
-  }
-
-  this.pacientesFiltrados = [...this.pacientesFiltrados].sort((a, b) => {
-    switch (criterio) {
-      case 'nombres':
-        return a.nombres.localeCompare(b.nombres);
-      case 'nombres_desc':
-        return b.nombres.localeCompare(a.nombres);
-      case 'fechaNacimiento':
-        return new Date(a.fechaNacimiento).getTime() - new Date(b.fechaNacimiento).getTime();
-      case 'fechaNacimiento_desc':
-        return new Date(b.fechaNacimiento).getTime() - new Date(a.fechaNacimiento).getTime();
-      case 'id':
-        return a.id - b.id;
-      case 'id_desc':
-        return b.id - a.id;
-      default:
-        return 0;
+  ordenarPor(campo: string) {
+    // Si es el mismo campo, cambiar dirección, si no, ordenar ascendente
+    if (this.ordenActual.campo === campo) {
+      this.ordenActual.direccion = this.ordenActual.direccion === 'asc' ? 'desc' : 'asc';
+    } else {
+      this.ordenActual.campo = campo;
+      this.ordenActual.direccion = 'asc';
     }
-  });
-}
 
-// Limpiar todos los filtros
-limpiarFiltros() {
-  this.pacientesFiltrados = [...this.pacientes];
-  
-  // Limpiar inputs con tipos específicos
-  const inputs = document.querySelectorAll('input, select');
-  inputs.forEach((input: Element) => {
-    if (input instanceof HTMLInputElement && input.type === 'text') {
-      input.value = '';
-    } else if (input instanceof HTMLSelectElement) {
-      input.value = '';
+    this.pacienteList.sort((a: any, b: any) => {
+      let valorA = a[campo];
+      let valorB = b[campo];
+
+      // Manejar valores null/undefined
+      if (valorA == null) valorA = '';
+      if (valorB == null) valorB = '';
+
+      // Si son números, convertir a número
+      if (campo === 'id') {
+        valorA = Number(valorA);
+        valorB = Number(valorB);
+      } else {
+        // Para strings, convertir a minúsculas para comparación
+        valorA = valorA.toString().toLowerCase();
+        valorB = valorB.toString().toLowerCase();
+      }
+
+      let resultado = 0;
+      if (valorA < valorB) {
+        resultado = -1;
+      } else if (valorA > valorB) {
+        resultado = 1;
+      }
+
+      // Para números (como ID), ordenar de mayor a menor por defecto
+      if (campo === 'id') {
+        return this.ordenActual.direccion === 'asc' ? -resultado : resultado;
+      } else {
+        // Para texto, ordenar de A a Z por defecto
+        return this.ordenActual.direccion === 'asc' ? resultado : -resultado;
+      }
+    });
+  }
+
+  getIconoOrden(campo: string): string {
+    if (this.ordenActual.campo !== campo) {
+      return 'fa fa-sort'; // Icono neutro
     }
-  });
-}
+    return this.ordenActual.direccion === 'asc' ? 'fa fa-sort-up' : 'fa fa-sort-down';
+  }
+
+  /**
+   * Métodos para búsqueda
+   */
+  buscarPacientes() {
+    let listaFiltrada = [...this.pacienteListOriginal];
+
+    // Filtrar por nombre (busca en nombres y apellidos)
+    if (this.busquedaNombre && this.busquedaNombre.trim() !== '') {
+      const nombreBusqueda = this.busquedaNombre.toLowerCase().trim();
+      listaFiltrada = listaFiltrada.filter(paciente => 
+        paciente.nombres.toLowerCase().includes(nombreBusqueda) ||
+        paciente.apellidos.toLowerCase().includes(nombreBusqueda) ||
+        (paciente.nombres + ' ' + paciente.apellidos).toLowerCase().includes(nombreBusqueda)
+      );
+    }
+
+    // Filtrar por documento
+    if (this.busquedaDocumento && this.busquedaDocumento.trim() !== '') {
+      const documentoBusqueda = this.busquedaDocumento.toLowerCase().trim();
+      listaFiltrada = listaFiltrada.filter(paciente => 
+        paciente.numeroDocumento.toLowerCase().includes(documentoBusqueda)
+      );
+    }
+
+    this.pacienteList = listaFiltrada;
+  }
+
+  limpiarBusqueda() {
+    this.busquedaNombre = '';
+    this.busquedaDocumento = '';
+    this.pacienteList = [...this.pacienteListOriginal];
+  }
+
+
 }
