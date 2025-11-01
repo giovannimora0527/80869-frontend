@@ -1,1 +1,143 @@
-<p>formula works!</p>
+<ngx-spinner type="ball-fussion" size="medium" color="#fff">
+  <p>{{ titleSpinner }}</p>
+</ngx-spinner>
+
+<div class="container">
+  <div class="card">
+    <div class="card-header">
+      <div class="d-flex justify-content-between align-items-center">
+        <h3 class="mb-0">
+          <i class="fa fa-users"></i>
+          &nbsp;Lista de formulas médicas
+        </h3>
+        <button class="btn btn-outline-primary" (click)="abrirNuevoFormula()">
+          <i class="fa fa-plus"></i>
+          Nuevo formula
+        </button>
+      </div>
+    </div>
+    <div class="card-body">
+      <div class="row">
+        <div class="col">
+          <input class="form-control" type="text" placeholder="Buscar..." [(ngModel)]="filtroBusqueda" (keyup)="filtrarFormulas()" />
+        </div>
+      </div>
+      <br />
+      <div class="row">
+        <div class="col">
+          <div class="table-responsive">
+            <table class="table table-striped table-hover">
+              <thead>
+                <tr>
+                  <th>Tipo y # de documento.</th>
+                  <th>Nombre completo del paciente</th>
+                  <th>Nombre del medicamento</th>
+                  <th>Presentación</th>
+                  <th>Dosis</th>
+                  <th>Indicaciones</th>
+                  <th>Fecha de registro</th>
+                  <th>Fecha de modificación del registro</th>
+                  <th>Acción</th>
+                </tr>
+              </thead>
+              <tbody *ngIf="formulaListFiltered && formulaListFiltered.length > 0">
+                <tr *ngFor="let formula of formulaListFiltered">
+                  <td>{{ formula.cita.paciente.tipoDocumento }} {{ formula.cita.paciente.numeroDocumento }}</td>
+                  <td>{{ formula.cita.paciente.nombres }} {{ formula.cita.paciente.apellidos }}</td>
+                  <td>{{ formula.medicamento.nombre }}</td>
+                  <td>{{ formula.medicamento.presentacion }}</td>
+                  <td>{{ formula.dosis }}</td>
+                  <td>{{ formula.indicaciones }}</td>
+                  <td>{{ formula.fechaCreacionRegistro | date: 'yyyy-MM-dd HH:mm' }}</td>
+                  <td>{{ formula.fechaModificacionRegistro | date: 'yyyy-MM-dd HH:mm' }}</td>
+                  <td>
+                    <button type="button" class="btn btn btn-outline-primary" title="Editar formula" (click)="abrirEditarFormula(formula)">
+                      <i class="fa fa-edit"></i>
+                    </button>
+                  </td>
+                </tr>
+              </tbody>
+              <tbody *ngIf="formulaListFiltered && formulaListFiltered.length === 0">
+                <tr>
+                  <td colspan="9" class="text-center">No hay formulas disponibles.</td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Modal para nuevo formula -->
+<div class="modal fade" id="modalCrearFormula" tabindex="-1" aria-labelledby="modalCrearFormulaLabel" aria-hidden="true">
+  <div class="modal-dialog modal-xl">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h1 class="modal-title fs-5" id="modalCrearFormulaLabel">
+          {{ titleModal }}
+        </h1>
+        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+      </div>
+      <div class="modal-body">
+        <div class="row">
+          <div class="col col-md-6">
+            <div class="input-group">
+              <input class="form-control" placeholder="Consulte el paciente por número de documento" 
+              [(ngModel)]="numeroDocumentoBuscar"/>
+              <button class="btn btn-outline-primary" type="button"
+              (click)="buscarPacientePorDocumento()">Buscar</button>
+            </div>
+          </div>
+        </div>
+        <br />
+        <div class="row">
+          <div class="col col-md-6">
+            <label for="citasPaciente">Citas del paciente</label>
+            <select id="citasPaciente" class="form-control">
+              <option disabled selected>Seleccion una cita</option>
+            </select>
+          </div>
+        </div>
+        <br />
+        <div class="row">
+          <div class="col col-md-6">
+            <label for="citasPaciente">Medicamento</label>
+            <select class="form-select">
+                <option selected disabled>Seleccione un medicamento</option>
+            </select>
+          </div>
+          <div class="col col-md-6">
+            <label for="citasPaciente">Dosis</label>
+            <input type="text" id="dosis" class="form-control" placeholder="Ingrese la dosis del medicamento" />
+          </div>
+        </div>
+
+        <div class="row">
+          <div class="col col-md-6">
+            <label for="indicaciones">Indicaciones</label>
+            <textarea 
+              id="indicaciones" 
+              class="form-control" 
+              placeholder="Ingrese las indicaciones del medicamento" 
+              rows="4"
+              [value]="indicaciones"
+              (input)="onIndicacionesChange($event)"
+              maxlength="500">
+            </textarea>
+            <div class="text-end mt-1">
+              <small class="text-muted">
+                {{ indicaciones.length }}/{{ maxCaracteresIndicaciones }} caracteres
+              </small>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cerrar</button>
+        <button type="button" class="btn btn-primary" (click)="guardarFormula()">{{ titleBoton }}</button>
+      </div>
+    </div>
+  </div>
+</div>

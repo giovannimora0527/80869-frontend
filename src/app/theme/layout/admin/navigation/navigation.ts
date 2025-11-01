@@ -42,47 +42,47 @@ export const NavigationItems: NavigationItem[] = [
         title: 'Gestión de Pacientes',
         type: 'item',
         url: '/inicio/paciente',
-        icon: 'feather icon-users',
+        icon: 'feather icon-user-check',
         classes: 'nav-item'
       },
-       {
+      {
         id: 'medicamento',
-        title: 'Gestión de Medicamentos',
+        title: 'Gestión de medicamentos',
         type: 'item',
         url: '/inicio/medicamento',
-        icon: 'feather icon-users',
+        icon: 'feather icon-user-check',
         classes: 'nav-item'
       },
-       {
+      {
         id: 'cita',
-        title: 'Gestión de Citas',
+        title: 'Gestión de citas',
         type: 'item',
         url: '/inicio/cita',
-        icon: 'feather icon-users',
+        icon: 'feather icon-user-check',
         classes: 'nav-item'
       },
-       {
+      {
         id: 'formula',
-        title: 'Gestión de Formulas',
+        title: 'Gestión de formulas medicas',
         type: 'item',
         url: '/inicio/formula-medica',
-        icon: 'feather icon-users',
+        icon: 'feather icon-user-check',
         classes: 'nav-item'
       },
-       {
+      {
         id: 'historia',
-        title: 'Gestión de Historias Clinicas',
+        title: 'Gestión de historias clinicas',
         type: 'item',
         url: '/inicio/historia-clinica',
-        icon: 'feather icon-users',
+        icon: 'feather icon-user-check',
         classes: 'nav-item'
       },
-       {
+      {
         id: 'especializacion',
-        title: 'Gestión de Especialización',
+        title: 'Gestión de especializaciones',
         type: 'item',
-        url: '/inicio/especializaciones',
-        icon: 'feather icon-users',
+        url: '/inicio/especializacion',
+        icon: 'feather icon-user-check',
         classes: 'nav-item'
       }
     ]

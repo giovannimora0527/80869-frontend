@@ -4,6 +4,5 @@ export class Usuario {
   rol!: string;
   fechaCreacion!: Date;
   activo!: boolean;
-  pass!: string;
   password!: string;
 }

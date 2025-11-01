@@ -20,15 +20,16 @@ export const routes: Routes = [
     path: 'inicio',
     component: AdminComponent,
     data: { title: 'Inicio' },
-    children: [   
+    children: [      
        { path: 'usuario', component: UsuarioComponent, data: { title: 'Usuario' }},
        { path: 'medico', component: MedicoComponent, data: { title: 'Medico' }},
        { path: 'paciente', component: PacienteComponent, data: { title: 'Paciente' }},
-       { path: 'medicamento', component: MedicamentoComponent, data: { title: 'Medico' }},
-       { path: 'cita', component: CitaComponent, data: { title: 'Medico' }},
-       { path: 'formula-medica', component: FormulaComponent, data: { title: 'Medico' }},
-       { path: 'historia-clinica', component: HistoriaComponent, data: { title: 'Medico' }},
-       { path: 'especializaciones', component: EspecializacionComponent, data: { title: 'Medico' }}
+       { path: 'cita', component: CitaComponent, data: { title: 'Cita' }},
+       { path: 'medicamento', component: MedicamentoComponent, data: { title: 'Medicamento' }},
+       { path: 'formula-medica', component: FormulaComponent, data: { title: 'Formula' }},
+       { path: 'historia-clinica', component: HistoriaComponent, data: { title: 'Historia' }},
+       { path: 'especializacion', component: EspecializacionComponent, data: { title: 'Especializacion' }}
+
     ]
   },
   { path: '**', redirectTo: 'inicio' }
