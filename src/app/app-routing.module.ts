@@ -9,13 +9,19 @@ import { EspecializacionComponent } from './demo/pages/especializacion/especiali
 import { FormulaComponent } from './demo/pages/formula/formula.component';
 import { HistoriaComponent } from './demo/pages/historia/historia.component';
 import { MedicamentoComponent } from './demo/pages/medicamento/medicamento.component';
+import { LoginComponent } from './demo/pages/login/login.component';
 
 export const routes: Routes = [
   {
     path: '',
-    redirectTo: 'inicio',
+    redirectTo: 'login',
     pathMatch: 'full'
   },  
+  {
+    path: 'login',
+    data: { title: 'Login' },
+    component: LoginComponent,
+  },
   {
     path: 'inicio',
     component: AdminComponent,
@@ -32,7 +38,7 @@ export const routes: Routes = [
 
     ]
   },
-  { path: '**', redirectTo: 'inicio' }
+  { path: '**', redirectTo: 'login' }
 ];
 
 @NgModule({

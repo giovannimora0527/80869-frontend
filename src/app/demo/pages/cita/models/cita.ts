@@ -3,9 +3,9 @@ import { Paciente } from "../../paciente/models/paciente";
 
 export class Cita {
     id!: number;
-    fechaHora!: Date;
+    fechaHora!: string;
     estado!: string;
     motivo!: string;
-    paciente: Paciente;
-    medico: Medico;
+    paciente!: Paciente;
+    medico!: Medico;
 }

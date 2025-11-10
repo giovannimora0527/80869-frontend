@@ -23,6 +23,7 @@
             <tr>
               <th>Id</th>
               <th>Nombre de usuario</th>
+              <th>Correo electrónico</th>
               <th>Rol</th>
               <th>Fecha de creación</th>
               <th>Estado</th>
@@ -33,6 +34,7 @@
             <tr *ngFor="let usuario of usuarios">
               <td>{{ usuario.id }}</td>
               <td>{{ usuario.username }}</td>
+              <td>{{ usuario.email }}</td>
               <td>{{ usuario.rol }}</td>
               <td>{{ usuario.fechaCreacion | date: 'yyyy-MM-dd HH:mm' }}</td>
               <td>
@@ -47,7 +49,7 @@
           </tbody>
           <tbody *ngIf="usuarios && usuarios.length === 0">
             <tr>
-              <td colspan="6" class="text-center">No hay usuarios disponibles.</td>
+              <td colspan="7" class="text-center">No hay usuarios disponibles.</td>
             </tr>
           </tbody>
         </table>
@@ -85,30 +87,23 @@
                   El nombre de usuario es requerido.
                 </div>
               </div>
-              <!-- Password -->
+              <!-- Email -->
               <div class="mb-3">
-                <label for="password" class="form-label">Contraseña</label>
-                <div class="input-group">
-                  <input
-                    [type]="mostrarPassword ? 'text' : 'password'"
-                    formControlName="password"
-                    class="form-control"
-                    id="password"
-                    placeholder="Ingrese la contraseña de usuario"
-                    [ngModel]="usuarioSelected?.password || ''"
-                  />
-                  <button type="button" class="btn btn-outline-secondary" (click)="mostrarPassword = !mostrarPassword" tabindex="-1">
-                    <i class="fa" style="margin-left: 10px" [ngClass]="mostrarPassword ? 'fa-eye-slash' : 'fa-eye'"></i>
-                  </button>
+                <label for="email" class="form-label">Correo electrónico</label>
+                <input
+                  type="email"
+                  formControlName="email"
+                  class="form-control"
+                  id="email"
+                  placeholder="Ingrese el correo electrónico"
+                  [ngModel]="usuarioSelected?.email || ''"
+                  [class.is-invalid]="form.get('email')?.invalid && (form.get('email')?.dirty || form.get('email')?.touched)"
+                />
+                <div *ngIf="form.get('email')?.hasError('required') && form.get('email')?.touched" class="invalid-feedback">
+                  El correo electrónico es requerido.
                 </div>
-                <div *ngIf="form.get('password')?.hasError('required') && form.get('password')?.touched" class="text-danger">
-                  La contraseña es requerida.
-                </div>
-                <div *ngIf="form.get('password')?.hasError('minlength') && form.get('password')?.touched" class="text-danger">
-                  La contraseña debe ser al menos de 8 caracteres.
-                </div>
-                <div *ngIf="form.get('password')?.hasError('maxlength') && form.get('password')?.touched" class="text-danger">
-                  La contraseña debe ser máximo de 16 caracteres.
+                <div *ngIf="form.get('email')?.hasError('email') && form.get('email')?.touched" class="invalid-feedback">
+                  El correo electrónico debe tener un formato válido.
                 </div>
               </div>
               <!--  Rol del usuario -->

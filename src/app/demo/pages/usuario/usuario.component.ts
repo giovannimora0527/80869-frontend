@@ -10,8 +10,7 @@ import Swal from 'sweetalert2';
 // Importa los objetos necesarios de Bootstrap
 import Modal from 'bootstrap/js/dist/modal';
 
-import { FormBuilder, FormGroup, Validators, AbstractControl, FormsModule, ReactiveFormsModule, ValidationErrors } from '@angular/forms';
-import { delay, map, Observable, of } from 'rxjs';
+import { FormBuilder, FormGroup, Validators, AbstractControl, FormsModule, ReactiveFormsModule } from '@angular/forms';
 
 @Component({
   selector: 'app-usuario',
@@ -20,7 +19,6 @@ import { delay, map, Observable, of } from 'rxjs';
   styleUrl: './usuario.component.scss'
 })
 export class UsuarioComponent {
-  mostrarPassword: boolean = false;
   modalInstance: Modal | null = null;
   modoFormulario: string = '';
   usuarios: Usuario[] = [];
@@ -43,20 +41,13 @@ export class UsuarioComponent {
   inicializarFormulario() {
     this.form = this.formBuilder.group({
       username: ['', [Validators.required, Validators.minLength(4), Validators.maxLength(10)]],
-      password: ['', [Validators.required, Validators.minLength(8), Validators.maxLength(16)], this.passwordAsyncValidator],
+      email: ['', [Validators.required, Validators.email]],
       rol: ['', [Validators.required]],
       activo: [true]
     });
   }
 
-  passwordAsyncValidator(control: AbstractControl): Observable<ValidationErrors | null> {
-    const contrasenasProhibidas = ['123456', 'password', 'admin'];
 
-    return of(contrasenasProhibidas.includes(control.value)).pipe(
-      delay(800), // simulamos llamada a servidor
-      map((invalida) => (invalida ? { passwordProhibida: true } : null))
-    );
-  }
 
   get f(): { [key: string]: AbstractControl } {
     return this.form.controls;
@@ -167,7 +158,7 @@ export class UsuarioComponent {
   limpiarFormulario() {
     this.form.reset({
       username: this.usuarioSelected ? this.usuarioSelected.username : '',
-      password: this.usuarioSelected ? this.usuarioSelected.password : '',
+      email: this.usuarioSelected ? this.usuarioSelected.email : '',
       rol: this.usuarioSelected ? this.usuarioSelected.rol : '',
       activo: this.usuarioSelected ? this.usuarioSelected.activo : false
     });

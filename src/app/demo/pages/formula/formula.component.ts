@@ -1,16 +1,20 @@
 import { Component } from '@angular/core';
 import { CommonModule } from '@angular/common';
+
 // Import library module
 import { NgxSpinnerModule, NgxSpinnerService } from 'ngx-spinner';
+
+import { FormBuilder, FormGroup, Validators, AbstractControl, FormsModule, ReactiveFormsModule } from '@angular/forms';
+
 import Swal from 'sweetalert2';
 // Importa los objetos necesarios de Bootstrap
 import Modal from 'bootstrap/js/dist/modal';
-
-import { FormBuilder, FormGroup, Validators, AbstractControl, FormsModule, ReactiveFormsModule } from '@angular/forms';
 import { Formula } from './models/formula';
 import { FormulaService } from './service/formula.service';
 import { PacienteService } from '../paciente/service/paciente.service';
 import { Paciente } from '../paciente/models/paciente';
+import { CitaService } from '../cita/service/cita.service';
+import { Cita } from '../cita/models/cita';
 
 @Component({
   selector: 'app-formula',
@@ -19,21 +23,24 @@ import { Paciente } from '../paciente/models/paciente';
   styleUrl: './formula.component.scss'
 })
 export class FormulaComponent {
+  mostrarPassword: boolean = false;
   modalInstance: Modal | null = null;
   modoFormulario: string = '';
-  formulaList: Formula[] = [];
-  formulaListFiltered: Formula[] = [];
   titleModal: string = '';
   titleBoton: string = '';
   formulaSelected: Formula;
   titleSpinner: string = 'Cargando...';
-  filtroBusqueda: string = "";
+  busqueda: string = '';
 
-  numeroDocumentoBuscar: string = "";
+  documentoPacienteBuscar: string = "";
   pacienteEncontrado: Paciente;
 
-  // Propiedades para el contador de caracteres de indicaciones
-  indicaciones: string = '';
+  formulaList: Formula[] = [];
+  formulaFiltered: Formula[] = [];
+  citasPaciente: Cita[] = [];
+
+  // Contador de caracteres para indicaciones
+  contadorIndicaciones: number = 0;
   maxCaracteresIndicaciones: number = 500;
 
   form: FormGroup;
@@ -41,11 +48,12 @@ export class FormulaComponent {
   constructor(
     private readonly formulaService: FormulaService,
     private readonly pacienteService: PacienteService,
+    private readonly citaService: CitaService,
     private readonly formBuilder: FormBuilder,
     private readonly spinner: NgxSpinnerService
   ) {
     this.inicializarFormulario();
-    this.listarFormulas();
+    this.listarFormulas();    
   }
 
   inicializarFormulario() {
@@ -53,7 +61,27 @@ export class FormulaComponent {
       citaId: ['', [Validators.required]],
       medicamentoId: ['', [Validators.required]],
       dosis: ['', [Validators.required]],
-      indicaciones: ['', [Validators.required]]
+      indicaciones: ['', [Validators.required, Validators.maxLength(this.maxCaracteresIndicaciones)]]
+    });
+
+    // Suscripción a los cambios del campo indicaciones para actualizar el contador
+    this.form.get('indicaciones')?.valueChanges.subscribe((valor: string) => {
+      this.contadorIndicaciones = valor ? valor.length : 0;
+    });
+  }
+
+  listarFormulas() {
+    this.spinner.show();
+    this.formulaService.listarFormulas().subscribe({
+      next: (data) => {
+        this.formulaList = data;
+        this.formulaFiltered = this.formulaList;
+        this.spinner.hide();
+      },
+      error: (error) => {
+        this.spinner.hide();
+        Swal.fire('Error', error.error.mesage, 'error');
+      }
     });
   }
 
@@ -72,6 +100,12 @@ export class FormulaComponent {
     this.titleModal = modo === 'C' ? 'Crear Formula' : 'Editar Formula';
     this.titleBoton = modo === 'C' ? 'Guardar Formula' : 'Actualizar Formula';
     this.modoFormulario = modo;
+    
+    // Si es modo crear, limpiar el formulario y resetear contador
+    if (modo === 'C') {
+      this.limpiarFormulario();
+    }
+    
     const modalElement = document.getElementById('modalCrearFormula');
     if (modalElement) {
       // Verificar si ya existe una instancia del modal
@@ -80,107 +114,100 @@ export class FormulaComponent {
     }
   }
 
-  limpiarFormulario() {
-    this.form.reset();
-    this.form.markAsPristine();
-    this.form.markAsUntouched();
-    this.indicaciones = '';
-  }
-
-  listarFormulas() {
-    this.formulaService.listarFormulas().subscribe({
-      next: (data) => {
-        this.formulaList = data;
-        this.formulaListFiltered = this.formulaList;
-      },
-      error: (error) => {
-        console.error('Error al listar las fórmulas:', error);
-      }
-    });
-  }
-
   abrirNuevoFormula() {
     this.formulaSelected = null;
+    this.contadorIndicaciones = 0; // Resetear contador para nuevo formulario
     this.openModal('C');
   }
 
   abrirEditarFormula(formula: Formula) {
     this.formulaSelected = formula;
+    // Actualizar contador con la longitud de las indicaciones existentes
+    this.contadorIndicaciones = formula.indicaciones ? formula.indicaciones.length : 0;
     this.openModal('E');
-  }
-
-  filtrarFormulas(){
-    if (this.filtroBusqueda.trim() === '') {
-      this.formulaListFiltered = this.formulaList;
-    }
-
-    this.formulaListFiltered = this.formulaList.filter((formula) => {
-      const busquedaLower = this.filtroBusqueda.toLowerCase();
-      const dosisCumple = formula.dosis && formula.dosis.toLowerCase().includes(busquedaLower);
-
-      const indicacionesCumple = formula.indicaciones && formula.indicaciones.toLowerCase().includes(busquedaLower);
-
-      const medicamentoCumple = formula.medicamento.nombre && formula.medicamento.nombre.toLowerCase().includes(busquedaLower);
-
-      const presentacionCumple = formula.medicamento.presentacion && formula.medicamento.presentacion.toLowerCase().includes(busquedaLower);
-
-      const nombresCumple = formula.cita.paciente.nombres && formula.cita.paciente.nombres.toLowerCase().includes(busquedaLower);
-
-      const apellidosCumple = formula.cita.paciente.apellidos && formula.cita.paciente.apellidos.toLowerCase().includes(busquedaLower);
-
-      const fechaCitaCumple = formula.cita.fechaHora && formula.cita.fechaHora.toString().includes(busquedaLower);
-
-      const documentoCumple = formula.cita.paciente.numeroDocumento && formula.cita?.paciente?.numeroDocumento.includes(busquedaLower);
-
-      const tipoDocumentoCumple = formula.cita.paciente.tipoDocumento && formula.cita?.paciente?.tipoDocumento.includes(busquedaLower);
-
-      return (
-        dosisCumple ||
-        indicacionesCumple ||
-        presentacionCumple ||
-        nombresCumple ||
-        apellidosCumple ||
-        fechaCitaCumple ||
-        documentoCumple ||
-        medicamentoCumple ||
-        tipoDocumentoCumple
-      );
+    
+    // Cargar los datos en el formulario
+    this.form.patchValue({
+      citaId: formula.cita?.id || '',
+      medicamentoId: formula.medicamento?.id || '',
+      dosis: formula.dosis || '',
+      indicaciones: formula.indicaciones || ''
     });
   }
 
-  onIndicacionesChange(event: Event) {
-    const target = event.target as HTMLTextAreaElement;
-    const value = target.value;
-    if (value.length <= this.maxCaracteresIndicaciones) {
-      this.indicaciones = value;
-      this.form.patchValue({ indicaciones: value });
-    } else {
-      // Truncar el texto si excede el límite
-      this.indicaciones = value.substring(0, this.maxCaracteresIndicaciones);
-      target.value = this.indicaciones;
-      this.form.patchValue({ indicaciones: this.indicaciones });
-    }
+  limpiarFormulario() {
+    this.form.markAsPristine();
+    this.form.markAsUntouched();
+    this.form.reset();
+    this.contadorIndicaciones = 0;
   }
 
-  getCaracteresRestantes(): number {
-    return this.maxCaracteresIndicaciones - this.indicaciones.length;
+  filtrarFormula() {
+    if (this.busqueda === '') {
+      this.formulaFiltered = this.formulaList;
+      return;
+    }
+    this.formulaFiltered = this.formulaList.filter((formula) => {
+      const busquedaLower = this.busqueda.toLowerCase();
+
+      // Filtrar por dosis
+      const dosisCumple = formula.dosis && formula.dosis.toLowerCase().includes(busquedaLower);
+
+      // Filtrar por indicaciones
+      const indicacionesCumple = formula.indicaciones && formula.indicaciones.toLowerCase().includes(busquedaLower);
+
+      // Filtrar por número de documento del paciente
+      const numeroDocumentoCumple =
+        formula.cita?.paciente?.numeroDocumento && formula.cita.paciente.numeroDocumento.toLowerCase().includes(busquedaLower);
+
+      // Filtrar por nombres del paciente
+      const nombresCumple = formula.cita?.paciente?.nombres && formula.cita.paciente.nombres.toLowerCase().includes(busquedaLower);
+
+      // Filtrar por apellidos del paciente
+      const apellidosCumple = formula.cita?.paciente?.apellidos && formula.cita.paciente.apellidos.toLowerCase().includes(busquedaLower);
+
+      // Filtrar por apellidos del paciente
+      const fechasCumple = formula.cita?.fechaHora && formula.cita.fechaHora.toLowerCase().includes(busquedaLower);
+
+      // Retorna true si cualquiera de los criterios se cumple
+      return dosisCumple || indicacionesCumple || numeroDocumentoCumple || nombresCumple || apellidosCumple || fechasCumple;
+    });
   }
 
   buscarPacientePorDocumento() {
-    console.log('Número de documento a buscar:', this.numeroDocumentoBuscar);
-     this.pacienteService.buscarPacienteXDocumento(this.numeroDocumentoBuscar).subscribe({
-       next: (data) => {
-         console.log('Paciente encontrado:', data);
-         this.pacienteEncontrado = data;
-       },
-       error: (error) => {
-         console.error('Error al buscar el paciente:', error);
-         Swal.fire("Advertencia", "Paciente no encontrado", "warning");
-       }
-     });
+    this.pacienteService.buscarPacientePorDocumento(this.documentoPacienteBuscar).subscribe({
+      next: (data) => {
+        console.log('Paciente encontrado:', data);
+        this.pacienteEncontrado = data;
+        // Coloco la logica para conocer las citas por paciente
+        this.citaService.buscarCitaPorPacienteId(this.pacienteEncontrado.id).subscribe({
+          next: (data) => {
+            console.log('Citas del paciente:', data);
+            this.citasPaciente = data;
+            Swal.fire("Citas cargadas correctamente","Citas del paciente encontradas", "success");
+          },
+          error: (error) => {
+            console.error('Error al buscar citas del paciente:', error);
+            Swal.fire('Error', error.error.message, 'error');
+          }
+        });
+      },
+      error: (error) => {
+        console.error('Error al buscar paciente:', error);
+        Swal.fire('Error', error.error.message, 'error');
+      }
+    });
   }
 
-  guardarFormula() {
-    
+  // Método para actualizar el contador de caracteres de indicaciones
+  onIndicacionesChange(event: Event) {
+    // Usar setTimeout para asegurar que el valor se actualice después de eventos como paste
+    setTimeout(() => {
+      const target = event.target as HTMLTextAreaElement;
+      const valor = target.value;
+      this.contadorIndicaciones = valor.length;
+    }, 0);
   }
+
+  guardarFormula() {}
 }
