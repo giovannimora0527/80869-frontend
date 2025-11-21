@@ -1,0 +1,332 @@
+<!-- ============================================================================
+     MÓDULO DE AUDITORÍA - LOGS DEL SISTEMA
+     ========================================================================= -->
+
+<div class="container-fluid">
+  <!-- Encabezado -->
+  <div class="page-header">
+    <div class="page-block">
+      <div class="row align-items-center">
+        <div class="col-md-12">
+          <div class="page-header-title">
+            <h5 class="m-b-10">Auditoría del Sistema</h5>
+          </div>
+          <ul class="breadcrumb">
+            <li class="breadcrumb-item"><a href="#!"><i class="feather icon-home"></i></a></li>
+            <li class="breadcrumb-item"><a href="#!">Seguridad</a></li>
+            <li class="breadcrumb-item"><a href="#!">Auditoría</a></li>
+          </ul>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Estadísticas -->
+  <div class="row" *ngIf="mostrarEstadisticas && estadisticas">
+    <div class="col-md-6 col-xl-3">
+      <div class="card daily-sales">
+        <div class="card-block">
+          <h6 class="mb-4">Total Eventos</h6>
+          <div class="row d-flex align-items-center">
+            <div class="col-9">
+              <h3 class="f-w-300 d-flex align-items-center m-b-0">
+                <i class="feather icon-list text-c-blue f-30 m-r-10"></i> 
+                {{ estadisticas.totalEventos | number }}
+              </h3>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="col-md-6 col-xl-3">
+      <div class="card daily-sales">
+        <div class="card-block">
+          <h6 class="mb-4">Logins Exitosos</h6>
+          <div class="row d-flex align-items-center">
+            <div class="col-9">
+              <h3 class="f-w-300 d-flex align-items-center m-b-0">
+                <i class="feather icon-check-circle text-c-green f-30 m-r-10"></i> 
+                {{ estadisticas.loginsExitosos | number }}
+              </h3>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="col-md-6 col-xl-3">
+      <div class="card daily-sales">
+        <div class="card-block">
+          <h6 class="mb-4">Logins Fallidos</h6>
+          <div class="row d-flex align-items-center">
+            <div class="col-9">
+              <h3 class="f-w-300 d-flex align-items-center m-b-0">
+                <i class="feather icon-x-circle text-c-red f-30 m-r-10"></i> 
+                {{ estadisticas.loginsFallidos | number }}
+              </h3>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="col-md-6 col-xl-3">
+      <div class="card daily-sales">
+        <div class="card-block">
+          <h6 class="mb-4">Usuarios Bloqueados</h6>
+          <div class="row d-flex align-items-center">
+            <div class="col-9">
+              <h3 class="f-w-300 d-flex align-items-center m-b-0">
+                <i class="feather icon-alert-circle text-c-yellow f-30 m-r-10"></i> 
+                {{ estadisticas.usuariosBloqueados | number }}
+              </h3>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Filtros -->
+  <div class="row">
+    <div class="col-sm-12">
+      <div class="card">
+        <div class="card-header">
+          <h5>
+            <i class="feather icon-filter"></i> Filtros de Búsqueda
+          </h5>
+        </div>
+        <div class="card-body">
+          <form [formGroup]="filtroForm" (ngSubmit)="aplicarFiltros()">
+            <div class="row">
+              <!-- Fecha Desde -->
+              <div class="col-md-3">
+                <div class="form-group">
+                  <label for="fechaDesde">Fecha Desde</label>
+                  <input 
+                    type="datetime-local" 
+                    class="form-control" 
+                    id="fechaDesde"
+                    formControlName="fechaDesde">
+                </div>
+              </div>
+
+              <!-- Fecha Hasta -->
+              <div class="col-md-3">
+                <div class="form-group">
+                  <label for="fechaHasta">Fecha Hasta</label>
+                  <input 
+                    type="datetime-local" 
+                    class="form-control" 
+                    id="fechaHasta"
+                    formControlName="fechaHasta">
+                </div>
+              </div>
+
+              <!-- Tipo de Evento -->
+              <div class="col-md-2">
+                <div class="form-group">
+                  <label for="tipoEvento">Tipo de Evento</label>
+                  <select class="form-control" id="tipoEvento" formControlName="tipoEvento">
+                    <option value="">Todos</option>
+                    <option *ngFor="let tipo of tiposEventos" [value]="tipo">{{ tipo }}</option>
+                  </select>
+                </div>
+              </div>
+
+              <!-- Nivel -->
+              <div class="col-md-2">
+                <div class="form-group">
+                  <label for="nivel">Nivel</label>
+                  <select class="form-control" id="nivel" formControlName="nivel">
+                    <option value="">Todos</option>
+                    <option *ngFor="let nivel of niveles" [value]="nivel">{{ nivel }}</option>
+                  </select>
+                </div>
+              </div>
+
+              <!-- Username -->
+              <div class="col-md-2">
+                <div class="form-group">
+                  <label for="username">Usuario</label>
+                  <input 
+                    type="text" 
+                    class="form-control" 
+                    id="username"
+                    formControlName="username"
+                    placeholder="Buscar por usuario">
+                </div>
+              </div>
+            </div>
+
+            <div class="row">
+              <div class="col-md-12 text-right">
+                <button type="button" class="btn btn-secondary mr-2" (click)="limpiarFiltros()">
+                  <i class="feather icon-x"></i> Limpiar
+                </button>
+                <button type="submit" class="btn btn-primary" [disabled]="isLoading">
+                  <i class="feather icon-search"></i> Buscar
+                </button>
+              </div>
+            </div>
+          </form>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Tabla de Logs -->
+  <div class="row">
+    <div class="col-sm-12">
+      <div class="card">
+        <div class="card-header">
+          <h5>
+            <i class="feather icon-list"></i> Logs de Auditoría
+            <span class="badge badge-primary ml-2">{{ totalElements }} registros</span>
+          </h5>
+          <div class="card-header-right">
+            <button class="btn btn-sm btn-success" (click)="exportarCSV()" [disabled]="logs.length === 0">
+              <i class="feather icon-download"></i> Exportar CSV
+            </button>
+            <button class="btn btn-sm btn-info ml-2" (click)="toggleEstadisticas()">
+              <i class="feather icon-bar-chart"></i> 
+              {{ mostrarEstadisticas ? 'Ocultar' : 'Mostrar' }} Estadísticas
+            </button>
+          </div>
+        </div>
+        <div class="card-body">
+          <div class="table-responsive">
+            <table class="table table-hover table-striped">
+              <thead>
+                <tr>
+                  <th>ID</th>
+                  <th>Fecha/Hora</th>
+                  <th>Tipo Evento</th>
+                  <th>Usuario</th>
+                  <th>IP</th>
+                  <th>Nivel</th>
+                  <th>Descripción</th>
+                  <th>Acciones</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr *ngFor="let log of logs">
+                  <td>{{ log.id }}</td>
+                  <td>
+                    <small>{{ formatDateTime(log.fechaHora) }}</small>
+                  </td>
+                  <td>
+                    <i [class]="getEventIcon(log.tipoEvento)"></i>
+                    <span class="ml-1">{{ log.tipoEvento }}</span>
+                  </td>
+                  <td>
+                    <strong>{{ log.username || 'N/A' }}</strong>
+                    <br>
+                    <small class="text-muted">{{ log.email || '' }}</small>
+                  </td>
+                  <td>
+                    <code>{{ log.ipAddress || 'N/A' }}</code>
+                  </td>
+                  <td>
+                    <span class="badge badge-{{ getBadgeClass(log.nivel) }}">
+                      {{ log.nivel }}
+                    </span>
+                  </td>
+                  <td>
+                    <small>{{ log.descripcion }}</small>
+                  </td>
+                  <td>
+                    <button 
+                      class="btn btn-sm btn-primary" 
+                      (click)="verDetalle(log)"
+                      title="Ver detalle completo">
+                      <i class="feather icon-eye"></i>
+                    </button>
+                  </td>
+                </tr>
+
+                <!-- Sin resultados -->
+                <tr *ngIf="logs.length === 0 && !isLoading">
+                  <td colspan="8" class="text-center">
+                    <i class="feather icon-inbox f-40 text-muted"></i>
+                    <p class="text-muted mt-2">No se encontraron logs con los filtros seleccionados</p>
+                  </td>
+                </tr>
+
+                <!-- Cargando -->
+                <tr *ngIf="isLoading">
+                  <td colspan="8" class="text-center">
+                    <div class="spinner-border text-primary" role="status">
+                      <span class="sr-only">Cargando...</span>
+                    </div>
+                    <p class="text-muted mt-2">Cargando logs...</p>
+                  </td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+
+          <!-- Paginación -->
+          <div class="row mt-3" *ngIf="totalPages > 1">
+            <div class="col-md-6">
+              <div class="form-group">
+                <label for="pageSize">Registros por página:</label>
+                <select 
+                  class="form-control" 
+                  id="pageSize" 
+                  style="width: auto; display: inline-block;"
+                  (change)="cambiarTamanioPagina($event)"
+                  [value]="pageSize">
+                  <option value="10">10</option>
+                  <option value="25">25</option>
+                  <option value="50">50</option>
+                  <option value="100">100</option>
+                </select>
+              </div>
+            </div>
+            <div class="col-md-6">
+              <nav aria-label="Page navigation">
+                <ul class="pagination justify-content-end">
+                  <li class="page-item" [class.disabled]="currentPage === 0">
+                    <a class="page-link" (click)="paginaAnterior()" tabindex="-1">
+                      <i class="feather icon-chevron-left"></i>
+                    </a>
+                  </li>
+                  
+                  <li 
+                    class="page-item" 
+                    *ngFor="let p of getPaginas()"
+                    [class.active]="p === currentPage">
+                    <a class="page-link" (click)="irAPagina(p)">{{ p + 1 }}</a>
+                  </li>
+                  
+                  <li class="page-item" [class.disabled]="currentPage >= totalPages - 1">
+                    <a class="page-link" (click)="paginaSiguiente()">
+                      <i class="feather icon-chevron-right"></i>
+                    </a>
+                  </li>
+                </ul>
+              </nav>
+              <p class="text-muted text-right">
+                Mostrando {{ currentPage * pageSize + 1 }} - 
+                {{ Math.min((currentPage + 1) * pageSize, totalElements) }} 
+                de {{ totalElements }} registros
+              </p>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Spinner global -->
+<ngx-spinner 
+  bdColor="rgba(0, 0, 0, 0.8)" 
+  size="medium" 
+  color="#fff" 
+  type="ball-clip-rotate"
+  [fullScreen]="true">
+  <p style="color: white">Cargando logs de auditoría...</p>
+</ngx-spinner>
