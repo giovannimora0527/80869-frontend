@@ -4,9 +4,9 @@ export class Medico {
     id!: number;
     nombres!: string;
     apellidos!: string;
-    numeroDocumento!: string;
+    documento!: string;
     tipoDocumento!: string;
     telefono!: string;
     registroProfesional!: string;
-    especializacion! : Especializacion
+    especializacion!: Especializacion;
 }

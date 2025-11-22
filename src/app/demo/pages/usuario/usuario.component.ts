@@ -2,23 +2,15 @@ import { Component } from '@angular/core';
 import { UsuarioService } from './service/usuario.service';
 import { Usuario } from './models/usuario';
 import { CommonModule } from '@angular/common';
-import {
-  FormBuilder,
-  FormControl,
-  FormGroup,
-  Validators,
-  AbstractControl,
-  FormsModule,
-  ReactiveFormsModule,
-  ValidationErrors
-} from '@angular/forms';
 
+// Import library module
 import { NgxSpinnerModule, NgxSpinnerService } from 'ngx-spinner';
 
 import Swal from 'sweetalert2';
 // Importa los objetos necesarios de Bootstrap
 import Modal from 'bootstrap/js/dist/modal';
-import { delay, map, Observable, of } from 'rxjs';
+
+import { FormBuilder, FormGroup, Validators, AbstractControl, FormsModule, ReactiveFormsModule } from '@angular/forms';
 
 @Component({
   selector: 'app-usuario',
@@ -33,65 +25,44 @@ export class UsuarioComponent {
   titleModal: string = '';
   titleBoton: string = '';
   usuarioSelected: Usuario;
-  msjSpinner: string = "";
+  titleSpinner: string = "Cargando...";
 
-  /**
-   * Formulario para crear/editar usuario.
-   */
-  form: FormGroup = new FormGroup({
-    username: new FormControl(''),
-    pass: new FormControl(''),
-    rol: new FormControl(''),
-    activo: new FormControl('')
-  });
+  form: FormGroup;
 
   constructor(
     private readonly usuarioService: UsuarioService,
     private readonly formBuilder: FormBuilder,
     private readonly spinner: NgxSpinnerService
-  ) {
+  ) {    
     this.listarUsuarios();
-    this.inicializarFormulario();
+    this.inicializarFormulario();    
   }
 
   inicializarFormulario() {
     this.form = this.formBuilder.group({
-      username: ['', [Validators.required, Validators.minLength(4), Validators.maxLength(12)]],
-      pass: ['', [Validators.required, Validators.minLength(8)], [this.passwordAsyncValidator]],
+      username: ['', [Validators.required, Validators.minLength(4), Validators.maxLength(10)]],
+      email: ['', [Validators.required, Validators.email]],
       rol: ['', [Validators.required]],
-      activo: ['']
+      activo: [true]
     });
   }
 
-  /**
-   * Siempre va igual.
-   */
+
+
   get f(): { [key: string]: AbstractControl } {
     return this.form.controls;
   }
 
-  passwordAsyncValidator(control: AbstractControl): Observable<ValidationErrors | null> {
-    const contrasenasProhibidas = ['123456', 'password', 'admin'];
-
-    return of(contrasenasProhibidas.includes(control.value)).pipe(
-      delay(800), // simulamos llamada a servidor
-      map((invalida) => (invalida ? { passwordProhibida: true } : null))
-    );
-  }
-
   listarUsuarios() {
-    this.msjSpinner = "Cargando usuarios ....";
     this.spinner.show();
     this.usuarioService.listarUsuarios().subscribe({
       next: (data) => {
-        this.spinner.hide();
         this.usuarios = data;
-        console.log(this.usuarios);
+        this.spinner.hide();
       },
       error: (error) => {
+        console.error('Error al listar usuarios', error);
         this.spinner.hide();
-        console.error('Error fetching users:', error);
-        Swal.fire('Error', "No se pudieron cargar los usuarios", 'error');
       }
     });
   }
@@ -101,26 +72,6 @@ export class UsuarioComponent {
       this.modalInstance.hide();
     }
     this.limpiarFormulario();
-  }
-
-  limpiarFormulario() {
-    this.form.reset();
-    this.form.markAsPristine();
-    this.form.markAsUntouched();
-    this.usuarioSelected = new Usuario();
-  }
-
-  abrirNuevoUsuario() {
-    this.usuarioSelected = new Usuario();
-    this.limpiarFormulario();
-    // Dejamos el formulario en blanco
-    this.openModal('C');
-  }
-
-  abrirEditarUsuario(usuario: Usuario) {
-    this.usuarioSelected = usuario;
-    this.form.get('activo')?.setValue(this.usuarioSelected.activo);
-    this.openModal('E');
   }
 
   openModal(modo: string) {
@@ -135,42 +86,83 @@ export class UsuarioComponent {
     }
   }
 
+  abrirNuevoUsuario() {
+    this.usuarioSelected = null;
+    this.openModal('C');
+  }
+
+  abrirEditarUsuario(usuario: Usuario) {
+    this.usuarioSelected = usuario;
+    this.openModal('E');
+  }
+
+  /**
+   * Funcion que permite guardar/actualizar un usuario.
+   */
   guardarUsuario() {
-    this.msjSpinner = this.modoFormulario === 'C' ? "Creando usuario ..." 
-    : "Actualizando usuario ...";
-    this.spinner.show();
+    this.titleSpinner = this.modoFormulario === 'C' ? "Creando usuario..." : "Actualizando usuario...";
+    this.spinner.show();   
+    if (this.modoFormulario === 'C') {
+      this.form.get('activo')?.setValue(true);
+    }
     if (this.form.invalid) {
-      Swal.fire('Error', 'Por favor, corrija los errores en el formulario.', 'error');
+      // Manejar el formulario inválido
+      this.spinner.hide();
+      Swal.fire('Error', 'Por favor, corrige los errores en el formulario.', 'error');
+      return;
     }
 
     if (this.modoFormulario === 'C') {
-      // Crear nuevo usuario
-      this.usuarioService.crearUsuario(this.form.value).subscribe({
-        next: (data) => {
-          Swal.fire('Éxito', data.mensaje, 'success');
-          this.listarUsuarios();
-          this.closeModal();
+      // Modo Creación
+      this.usuarioService.guardarUsuario(this.form.getRawValue()).subscribe({
+        next: (data) => {          
+          if (data.status === 200) {
+            this.spinner.hide();
+            Swal.fire('Éxito', data.mensaje, 'success');
+            this.closeModal();
+            this.listarUsuarios();
+          } else {
+            this.spinner.hide();
+            Swal.fire('Error', data.mensaje, 'error');
+          }
         },
         error: (error) => {
+          this.spinner.hide();        
           Swal.fire('Error', error.error.message, 'error');
         }
       });
     } else {
-      // Editar usuario existente
-      const id = this.usuarioSelected.id!;
-      const usuarioActualizado = { ...this.usuarioSelected, ...this.form.value };
-      usuarioActualizado.id = id;
-      console.log(usuarioActualizado);
-      this.usuarioService.editarUsuario(usuarioActualizado).subscribe({
-        next: (data) => {
-          Swal.fire('Éxito', data.mensaje, 'success');
-          this.listarUsuarios();
-          this.closeModal();
+      // Modo Edición
+      const usuarioActualizado: Usuario = this.form.getRawValue();
+      usuarioActualizado.id = this.usuarioSelected.id;
+      this.usuarioService.actualizarUsuario(usuarioActualizado).subscribe({
+        next: (data) => {       
+          if (data.status === 200) {
+            this.spinner.hide();
+            Swal.fire('Éxito', data.mensaje, 'success');
+            this.closeModal();
+            this.listarUsuarios();
+          } else {
+            this.spinner.hide();
+            Swal.fire('Error', data.mensaje, 'error');
+          }
         },
         error: (error) => {
+          this.spinner.hide();          
           Swal.fire('Error', error.error.message, 'error');
         }
       });
     }
+  }
+
+  limpiarFormulario() {
+    this.form.reset({
+      username: this.usuarioSelected ? this.usuarioSelected.username : '',
+      email: this.usuarioSelected ? this.usuarioSelected.email : '',
+      rol: this.usuarioSelected ? this.usuarioSelected.rol : '',
+      activo: this.usuarioSelected ? this.usuarioSelected.activo : false
+    });
+    this.form.markAsPristine();
+    this.form.markAsUntouched();
   }
 }

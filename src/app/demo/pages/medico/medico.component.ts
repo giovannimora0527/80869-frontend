@@ -2,15 +2,15 @@ import { Component } from '@angular/core';
 import { MedicoService } from './service/medico.service';
 import { Medico } from './models/medico';
 import { CommonModule } from '@angular/common';
-
+import { FormBuilder, FormGroup, Validators, AbstractControl, FormsModule, ReactiveFormsModule } from '@angular/forms';
 import { NgxSpinnerModule, NgxSpinnerService } from 'ngx-spinner';
 
-import Swal from 'sweetalert2';
+// Importa los objetos necesarios de Bootstrap
+import Modal from 'bootstrap/js/dist/modal';
 import { UtilApiService } from 'src/app/services/common/util-api.service';
 import { Especializacion } from './models/especializacion';
 
-import { FormBuilder, FormControl, FormGroup, Validators, FormsModule, ReactiveFormsModule, AbstractControl } from '@angular/forms';
-import Modal from 'bootstrap/js/dist/modal';
+import Swal from 'sweetalert2';
 
 @Component({
   selector: 'app-medico',
@@ -19,87 +19,83 @@ import Modal from 'bootstrap/js/dist/modal';
   styleUrl: './medico.component.scss'
 })
 export class MedicoComponent {
+  /**
+   * Variables para el modal.
+   */
   modalInstance: Modal | null = null;
   modoFormulario: string = '';
   titleModal: string = '';
   titleBoton: string = '';
-  medicoList: Medico[] = [];
-  especializacionesList: Especializacion[] = [];
   medicoSelected: Medico;
-  msjSpinner: string = 'Probando spinner ....';
+  titleSpinner: string = 'Cargando...';
+
+  /**
+   * Variables para la tabla de datos o datatable.
+   */
+  medicoList: Medico[] = [];
+  especializacionList: Especializacion[] = [];
+
+  form: FormGroup;
 
   constructor(
     private readonly medicoService: MedicoService,
-    private readonly utilApiService: UtilApiService,
     private readonly formBuilder: FormBuilder,
+    private readonly utilApiService: UtilApiService,
     private readonly spinner: NgxSpinnerService
   ) {
     this.listarMedicos();
+    this.listarEspecializaciones();
     this.inicializarFormulario();
-    this.cargarEspecializaciones();
   }
-
-  /**
-   * Formulario para crear/editar usuario.
-   */
-  form: FormGroup = new FormGroup({
-    tipoDocumento: new FormControl(''),
-    numeroDocumento: new FormControl(''),
-    nombres: new FormControl(''),
-    apellidos: new FormControl(''),
-    telefono: new FormControl(''),
-    registroProfesional: new FormControl(''),
-    especializacion: new FormControl('')
-  });
 
   inicializarFormulario() {
     this.form = this.formBuilder.group({
       tipoDocumento: ['', [Validators.required]],
-      numeroDocumento: ['', [Validators.required, Validators.minLength(8)]],
+      documento: ['', [Validators.required, Validators.minLength(5), Validators.maxLength(16)]],
       nombres: ['', [Validators.required, Validators.minLength(3)]],
-      apellidos: ['', [Validators.required]],
-      telefono: ['', [Validators.required]],
+      apellidos: ['', [Validators.required, Validators.minLength(4)]],
+      telefono: ['', [Validators.required, Validators.minLength(7), Validators.maxLength(10)]],
       registroProfesional: ['', [Validators.required]],
-      especializacion: ['', [Validators.required]]
+      especializacion: ['', [Validators.required]],
+      activo: [true]
     });
   }
 
-  /**
-   * Siempre va igual.
-   */
   get f(): { [key: string]: AbstractControl } {
     return this.form.controls;
   }
 
-  cargarEspecializaciones() {
-    this.utilApiService.listarEspecialidades('especializacion').subscribe({
+  listarEspecializaciones() {
+    this.utilApiService.listarEspecializaciones().subscribe({
       next: (data) => {
-        this.especializacionesList = data;
+        this.especializacionList = data;
       },
       error: (error) => {
-        console.log(error);
-        Swal.fire('Error', 'No se pudieron cargar las especializaciones.', 'error');
+        console.error('Error fetching especializaciones:', error);
       }
     });
   }
 
   listarMedicos() {
-    this.spinner.show();
     this.medicoService.listarMedicos().subscribe({
       next: (data) => {
-        this.spinner.hide();
         this.medicoList = data;
       },
       error: (error) => {
-        this.spinner.hide();
-        console.error('Error fetching medicos:', error);
+        console.error('Error fetching medico list:', error);
       }
     });
   }
 
+  closeModal() {
+    if (this.modalInstance) {
+      this.modalInstance.hide();
+    }
+  }
+
   openModal(modo: string) {
-    this.titleModal = modo === 'C' ? 'Crear médico' : 'Editar médico';
-    this.titleBoton = modo === 'C' ? 'Guardar médico' : 'Actualizar médico';
+    this.titleModal = modo === 'C' ? 'Crear Medico' : 'Editar Medico';
+    this.titleBoton = modo === 'C' ? 'Guardar Medico' : 'Actualizar Medico';
     this.modoFormulario = modo;
     const modalElement = document.getElementById('modalCrearMedico');
     if (modalElement) {
@@ -109,34 +105,40 @@ export class MedicoComponent {
     }
   }
 
-  closeModal() {
-    if (this.modalInstance) {
-      this.modalInstance.hide();
-    }
-    this.limpiarFormulario();
+  abrirNuevoMedico() {
+    this.medicoSelected = null;
+    this.openModal('C');
   }
 
-  limpiarFormulario() {
-    this.form.reset();
-    this.form.markAsPristine();
-    this.form.markAsUntouched();
+  editarModalMedico(medico: Medico) {
+    this.medicoSelected = medico;
+    console.log(medico);
+    this.openModal('E');
   }
 
   guardarMedico() {
-    this.msjSpinner = this.modoFormulario === 'C' ? 'Creando usuario ...' : 'Actualizando usuario ...';
+    this.titleSpinner = this.modoFormulario === 'C' ? 'Creando médico...' : 'Actualizando médico...';
     this.spinner.show();
     if (this.form.invalid) {
+      // Manejar el formulario inválido
       this.spinner.hide();
-      Swal.fire('Error', 'Por favor, corrija los errores en el formulario.', 'error');
+      Swal.fire('Error', 'Por favor, corrige los errores en el formulario.', 'error');
+      return;
     }
+
     if (this.modoFormulario === 'C') {
-      // Creacion
-      this.medicoService.guardarMedico(this.form.value).subscribe({
+      // Crear     
+      this.medicoService.guardarMedico(this.form.getRawValue()).subscribe({
         next: (data) => {
-          this.spinner.hide();
-          Swal.fire('Éxito', data.mensaje, 'success');
-          this.listarMedicos();
-          this.closeModal();
+          if (data.status === 200) {
+            this.spinner.hide();
+            Swal.fire('Éxito', data.mensaje, 'success');
+            this.closeModal();
+            this.listarMedicos();
+          } else {
+            this.spinner.hide();
+            Swal.fire('Error', data.mensaje, 'error');
+          }
         },
         error: (error) => {
           this.spinner.hide();
@@ -144,14 +146,20 @@ export class MedicoComponent {
         }
       });
     } else {
-      const medicoActualizar = { ...this.medicoSelected, ...this.form.value };
-      // Edicion o actualizar
-       this.medicoService.actualizarMedico(medicoActualizar).subscribe({
+      // Actualizar      
+      const usuarioActualizado: Medico = this.form.getRawValue();
+      usuarioActualizado.id = this.medicoSelected.id;
+      this.medicoService.actualizarMedico(usuarioActualizado).subscribe({
         next: (data) => {
-          this.spinner.hide();
-          Swal.fire('Éxito', data.mensaje, 'success');
-          this.listarMedicos();
-          this.closeModal();
+          if (data.status === 200) {
+            this.spinner.hide();
+            Swal.fire('Éxito', data.mensaje, 'success');
+            this.closeModal();
+            this.listarMedicos();
+          } else {
+            this.spinner.hide();
+            Swal.fire('Error', data.mensaje, 'error');
+          }
         },
         error: (error) => {
           this.spinner.hide();
@@ -159,14 +167,5 @@ export class MedicoComponent {
         }
       });
     }
-  }
-
-  abrirMedicoModal() {
-    this.openModal('C');
-  }
-
-  editarModalMedico(medico: Medico) {
-    this.medicoSelected = medico;
-    this.openModal('E');
   }
 }
