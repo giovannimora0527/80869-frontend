@@ -45,9 +45,17 @@ export class AuditoriaComponent implements OnInit {
   }
 
   ngOnInit(): void {
-    this.cargarTiposEventos();
     this.cargarEstadisticas();
     this.buscarLogs();
+    // Tipos de eventos y niveles definidos localmente
+    this.tiposEventos = [
+      'LOGIN_EXITOSO',
+      'LOGIN_FALLIDO', 
+      'USUARIO_BLOQUEADO',
+      'PASSWORD_RECOVERY',
+      'PASSWORD_CHANGE'
+    ];
+    this.niveles = ['INFO', 'WARNING', 'ERROR', 'CRITICAL'];
   }
 
   /**
@@ -68,25 +76,12 @@ export class AuditoriaComponent implements OnInit {
   }
 
   /**
-   * Carga los tipos de eventos desde el backend
-   */
-  cargarTiposEventos(): void {
-    this.auditoriaService.obtenerTiposEventos().subscribe({
-      next: (tipos) => {
-        this.tiposEventos = tipos;
-      },
-      error: (error) => {
-        console.error('Error al cargar tipos de eventos:', error);
-      }
-    });
-  }
-
-  /**
    * Carga las estadísticas de auditoría
    */
   cargarEstadisticas(): void {
     this.auditoriaService.obtenerEstadisticas().subscribe({
       next: (stats) => {
+        console.log('📊 Estadísticas recibidas:', stats);
         this.estadisticas = stats;
       },
       error: (error) => {
@@ -126,21 +121,38 @@ export class AuditoriaComponent implements OnInit {
     }
 
     this.auditoriaService.consultarLogs(filtro).subscribe({
-      next: (response) => {
-        this.logs = response.content;
-        this.totalPages = response.totalPages;
-        this.totalElements = response.totalElements;
-        this.currentPage = response.number;
+      next: (response: any) => {
+        // El backend retorna List<AuditoriaLog> directamente, no paginado
+        if (Array.isArray(response)) {
+          this.logs = response;
+          this.totalElements = response.length;
+          this.totalPages = Math.ceil(response.length / this.pageSize);
+          this.currentPage = 0;
+        } else if (response.content) {
+          // Por si en el futuro el backend retorna paginado
+          this.logs = response.content || [];
+          this.totalPages = response.totalPages || 0;
+          this.totalElements = response.totalElements || 0;
+          this.currentPage = response.number || 0;
+        } else {
+          this.logs = [];
+          this.totalPages = 0;
+          this.totalElements = 0;
+          this.currentPage = 0;
+        }
         this.isLoading = false;
         this.spinner.hide();
       },
       error: (error) => {
         console.error('Error al buscar logs:', error);
+        this.logs = [];
+        this.totalPages = 0;
+        this.totalElements = 0;
         this.isLoading = false;
         this.spinner.hide();
         Swal.fire({
           title: 'Error',
-          text: 'No se pudieron cargar los logs de auditoría',
+          text: 'No se pudieron cargar los logs de auditoría. Verifique que el backend esté corriendo.',
           icon: 'error'
         });
       }

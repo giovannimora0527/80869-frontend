@@ -84,6 +84,14 @@ export const NavigationItems: NavigationItem[] = [
         url: '/inicio/especializacion',
         icon: 'feather icon-user-check',
         classes: 'nav-item'
+      },
+      {
+        id: 'auditoria',
+        title: 'Auditoría y Logs',
+        type: 'item',
+        url: '/inicio/auditoria',
+        icon: 'feather icon-shield',
+        classes: 'nav-item'
       }
     ]
   },

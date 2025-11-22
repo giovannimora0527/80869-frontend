@@ -1,14 +1,15 @@
 import { Injectable } from '@angular/core';
 import { Observable } from 'rxjs';
 import { BackendService } from '../../../../services/backend.service';
+import { environment } from '../../../../../environments/environment';
 import { AuditoriaLog, AuditoriaFiltro, AuditoriaResponse, AuditoriaEstadisticas } from '../models/auditoria-log';
 
 @Injectable({
   providedIn: 'root'
 })
 export class AuditoriaService {
-  private readonly urlBase = 'auditoria';
-  private readonly endpoint = '';
+  private readonly urlBase = environment.apiUrl;
+  private readonly endpoint = 'auditoria';
 
   constructor(private readonly backendService: BackendService) { }
 

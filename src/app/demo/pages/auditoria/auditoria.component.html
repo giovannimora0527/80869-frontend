@@ -47,7 +47,7 @@
             <div class="col-9">
               <h3 class="f-w-300 d-flex align-items-center m-b-0">
                 <i class="feather icon-check-circle text-c-green f-30 m-r-10"></i> 
-                {{ estadisticas.loginsExitosos | number }}
+                {{ estadisticas.loginExitosos | number }}
               </h3>
             </div>
           </div>
@@ -63,7 +63,7 @@
             <div class="col-9">
               <h3 class="f-w-300 d-flex align-items-center m-b-0">
                 <i class="feather icon-x-circle text-c-red f-30 m-r-10"></i> 
-                {{ estadisticas.loginsFallidos | number }}
+                {{ estadisticas.loginFallidos | number }}
               </h3>
             </div>
           </div>
@@ -229,7 +229,7 @@
                     <code>{{ log.ipAddress || 'N/A' }}</code>
                   </td>
                   <td>
-                    <span class="badge badge-{{ getBadgeClass(log.nivel) }}">
+                    <span class="badge badge-{{ getBadgeClass(log.nivel) }}" style="color: black;">
                       {{ log.nivel }}
                     </span>
                   </td>

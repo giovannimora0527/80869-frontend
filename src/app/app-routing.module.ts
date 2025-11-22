@@ -10,6 +10,7 @@ import { FormulaComponent } from './demo/pages/formula/formula.component';
 import { HistoriaComponent } from './demo/pages/historia/historia.component';
 import { MedicamentoComponent } from './demo/pages/medicamento/medicamento.component';
 import { LoginComponent } from './demo/pages/login/login.component';
+import { AuditoriaComponent } from './demo/pages/auditoria/auditoria.component';
 
 export const routes: Routes = [
   {
@@ -34,7 +35,8 @@ export const routes: Routes = [
        { path: 'medicamento', component: MedicamentoComponent, data: { title: 'Medicamento' }},
        { path: 'formula-medica', component: FormulaComponent, data: { title: 'Formula' }},
        { path: 'historia-clinica', component: HistoriaComponent, data: { title: 'Historia' }},
-       { path: 'especializacion', component: EspecializacionComponent, data: { title: 'Especializacion' }}
+       { path: 'especializacion', component: EspecializacionComponent, data: { title: 'Especializacion' }},
+       { path: 'auditoria', component: AuditoriaComponent, data: { title: 'Auditoría' }}
 
     ]
   },

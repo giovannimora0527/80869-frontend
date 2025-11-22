@@ -45,8 +45,8 @@ export interface AuditoriaResponse {
  */
 export interface AuditoriaEstadisticas {
   totalEventos: number;
-  loginsExitosos: number;
-  loginsFallidos: number;
+  loginExitosos: number;
+  loginFallidos: number;
   usuariosBloqueados: number;
   recuperacionesPassword: number;
   usuariosActivos: number;
