@@ -1,0 +1,269 @@
+<!-- Header moderno con gradiente -->
+<div class="audit-header">
+  <div class="header-content">
+    <div class="header-icon">
+      <i class="feather icon-shield"></i>
+    </div>
+    <div class="header-text">
+      <h3 class="mb-1">Panel de Auditoría</h3>
+      <p class="text-muted mb-0">Monitoreo y seguimiento de actividades del sistema</p>
+    </div>
+  </div>
+  <div class="header-stats">
+    <div class="stat-card">
+      <div class="stat-icon success">
+        <i class="feather icon-check-circle"></i>
+      </div>
+      <div class="stat-info">
+        <span class="stat-label">Éxitos</span>
+        <span class="stat-value">{{ estadisticas.exitos }}</span>
+      </div>
+    </div>
+    <div class="stat-card">
+      <div class="stat-icon danger">
+        <i class="feather icon-x-circle"></i>
+      </div>
+      <div class="stat-info">
+        <span class="stat-label">Fallos</span>
+        <span class="stat-value">{{ estadisticas.fallos }}</span>
+      </div>
+    </div>
+    <div class="stat-card">
+      <div class="stat-icon info">
+        <i class="feather icon-activity"></i>
+      </div>
+      <div class="stat-info">
+        <span class="stat-label">Total</span>
+        <span class="stat-value">{{ totalElements }}</span>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Panel de filtros moderno -->
+<div class="filters-panel">
+  <div class="filters-header">
+    <h5 class="mb-0"><i class="feather icon-filter me-2"></i>Filtros de Búsqueda</h5>
+    <button class="btn btn-sm btn-outline-secondary" (click)="limpiarFiltros()">
+      <i class="feather icon-refresh-cw me-1"></i>Limpiar
+    </button>
+  </div>
+  
+  <div class="filters-body">
+    <div class="row g-3">
+      <div class="col-md-3">
+        <div class="filter-group">
+          <label class="filter-label">
+            <i class="feather icon-user"></i>
+            Usuario
+          </label>
+          <input 
+            class="form-control modern-input" 
+            placeholder="Buscar por usuario..." 
+            [formControl]="usuarioControl" 
+          />
+        </div>
+      </div>
+      
+      <div class="col-md-2">
+        <div class="filter-group">
+          <label class="filter-label">
+            <i class="feather icon-check-square"></i>
+            Estado
+          </label>
+          <select class="form-select modern-select" [formControl]="exitoControl">
+            <option value="">Todos</option>
+            <option value="true">✓ Exitosos</option>
+            <option value="false">✗ Fallidos</option>
+          </select>
+        </div>
+      </div>
+      
+      <div class="col-md-3">
+        <div class="filter-group">
+          <label class="filter-label">
+            <i class="feather icon-calendar"></i>
+            Desde
+          </label>
+          <input 
+            type="datetime-local" 
+            class="form-control modern-input" 
+            [formControl]="startControl" 
+          />
+        </div>
+      </div>
+      
+      <div class="col-md-3">
+        <div class="filter-group">
+          <label class="filter-label">
+            <i class="feather icon-calendar"></i>
+            Hasta
+          </label>
+          <input 
+            type="datetime-local" 
+            class="form-control modern-input" 
+            [formControl]="endControl" 
+          />
+        </div>
+      </div>
+      
+      <div class="col-md-1">
+        <div class="filter-group">
+          <label class="filter-label">
+            <i class="feather icon-list"></i>
+            Mostrar
+          </label>
+          <select 
+            class="form-select modern-select" 
+            [value]="size" 
+            (change)="setPageSize($any($event.target).value)"
+          >
+            <option *ngFor="let s of pageSizes" [value]="s">{{ s }}</option>
+          </select>
+        </div>
+      </div>
+    </div>
+    
+    <div *ngIf="fechaError" class="alert alert-danger modern-alert mt-3">
+      <i class="feather icon-alert-triangle me-2"></i>
+      {{ fechaError }}
+    </div>
+  </div>
+</div>
+
+<!-- Loader -->
+<div *ngIf="loading" class="loading-overlay">
+  <div class="spinner-container">
+    <div class="modern-spinner"></div>
+    <p class="mt-3">Cargando datos...</p>
+  </div>
+</div>
+
+<!-- Tabla moderna con cards -->
+<div class="audit-table-container" *ngIf="!loading">
+  <ng-container *ngIf="resultados && resultados.length > 0; else noResults">
+    
+    <!-- Vista de tabla para pantallas grandes -->
+    <div class="table-view d-none d-lg-block">
+      <div class="modern-table-wrapper">
+        <table class="modern-table">
+          <thead>
+            <tr>
+              <th><i class="feather icon-user me-2"></i>Usuario</th>
+              <th><i class="feather icon-clock me-2"></i>Fecha y Hora</th>
+              <th><i class="feather icon-globe me-2"></i>Dirección IP</th>
+              <th><i class="feather icon-activity me-2"></i>Resultado</th>
+              <th><i class="feather icon-info me-2"></i>Motivo</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr *ngFor="let item of resultados" [class.success-row]="item.exito" [class.error-row]="!item.exito">
+              <td>
+                <div class="user-cell">
+                  <div class="user-avatar" [class.success]="item.exito" [class.error]="!item.exito">
+                    {{ item.usuario?.charAt(0).toUpperCase() }}
+                  </div>
+                  <span class="user-name">{{ item.usuario }}</span>
+                </div>
+              </td>
+              <td>
+                <div class="date-cell">
+                  <i class="feather icon-calendar me-2"></i>
+                  {{ item.fechaHora | date:'dd/MM/yyyy HH:mm:ss' }}
+                </div>
+              </td>
+              <td>
+                <span class="badge badge-ip">
+                  <i class="feather icon-map-pin me-1"></i>
+                  {{ item.ip || 'N/A' }}
+                </span>
+              </td>
+              <td>
+                <span class="status-badge" [class.success]="item.exito" [class.error]="!item.exito">
+                  <i class="feather" [class.icon-check-circle]="item.exito" [class.icon-x-circle]="!item.exito"></i>
+                  {{ item.exito ? 'EXITOSO' : 'FALLIDO' }}
+                </span>
+              </td>
+              <td>
+                <span class="motivo-text" [title]="item.motivo">
+                  {{ item.motivo || 'Sin detalles' }}
+                </span>
+              </td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+    
+    <!-- Vista de cards para móviles -->
+    <div class="cards-view d-lg-none">
+      <div class="audit-card" *ngFor="let item of resultados" [class.success-card]="item.exito" [class.error-card]="!item.exito">
+        <div class="card-header-custom">
+          <div class="user-info">
+            <div class="user-avatar-mobile" [class.success]="item.exito" [class.error]="!item.exito">
+              {{ item.usuario?.charAt(0).toUpperCase() }}
+            </div>
+            <div>
+              <div class="user-name-mobile">{{ item.usuario }}</div>
+              <div class="date-mobile">
+                <i class="feather icon-clock me-1"></i>
+                {{ item.fechaHora | date:'dd/MM HH:mm' }}
+              </div>
+            </div>
+          </div>
+          <span class="status-badge-mobile" [class.success]="item.exito" [class.error]="!item.exito">
+            <i class="feather" [class.icon-check]="item.exito" [class.icon-x]="!item.exito"></i>
+          </span>
+        </div>
+        <div class="card-body-custom">
+          <div class="info-row">
+            <span class="label"><i class="feather icon-globe me-1"></i>IP:</span>
+            <span class="value">{{ item.ip || 'N/A' }}</span>
+          </div>
+          <div class="info-row">
+            <span class="label"><i class="feather icon-info me-1"></i>Motivo:</span>
+            <span class="value">{{ item.motivo || 'Sin detalles' }}</span>
+          </div>
+        </div>
+      </div>
+    </div>
+    
+    <!-- Paginador moderno -->
+    <div class="modern-pagination">
+      <div class="pagination-info">
+        Mostrando {{ (page * size) + 1 }} - {{ Math.min((page + 1) * size, totalElements) }} de {{ totalElements }} registros
+      </div>
+      <div class="pagination-controls">
+        <button 
+          class="btn-pagination" 
+          [disabled]="page === 0" 
+          (click)="cambiarPagina(-1)"
+        >
+          <i class="feather icon-chevron-left"></i>
+        </button>
+        <span class="page-indicator">Página {{ page + 1 }} de {{ totalPages }}</span>
+        <button 
+          class="btn-pagination" 
+          [disabled]="page >= totalPages - 1" 
+          (click)="cambiarPagina(1)"
+        >
+          <i class="feather icon-chevron-right"></i>
+        </button>
+      </div>
+    </div>
+    
+  </ng-container>
+
+  <ng-template #noResults>
+    <div class="no-results">
+      <div class="no-results-icon">
+        <i class="feather icon-inbox"></i>
+      </div>
+      <h5>No hay registros</h5>
+      <p class="text-muted">No se encontraron auditorías que coincidan con los filtros seleccionados.</p>
+      <button class="btn btn-primary" (click)="limpiarFiltros()">
+        <i class="feather icon-refresh-cw me-2"></i>Limpiar filtros
+      </button>
+    </div>
+  </ng-template>
+</div>
