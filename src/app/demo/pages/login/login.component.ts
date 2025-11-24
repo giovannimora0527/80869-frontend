@@ -5,6 +5,8 @@ import { NgxSpinnerModule, NgxSpinnerService } from 'ngx-spinner';
 import Swal from 'sweetalert2';
 import { LoginService } from './service/login.service';
 import { Router } from '@angular/router';
+import { SolicitarRecuperacionRq } from './models/login-rq';
+import { result } from 'lodash';
 
 @Component({
   selector: 'app-login',
@@ -99,6 +101,10 @@ export class LoginComponent {
 
   onForgotPassword(event: Event) {
     event.preventDefault();
+    const req: SolicitarRecuperacionRq = {
+      email: ''
+    };
+
 
     Swal.fire({
       title: 'Recuperar contraseña',
@@ -117,11 +123,10 @@ export class LoginComponent {
           Swal.showValidationMessage('El correo electrónico es requerido');
           return false;
         }
-
         // Simular envío de email de recuperación
         return new Promise<boolean>((resolve) => {
           setTimeout(() => {
-            console.log('Enviar email de recuperación a:', email);
+            req.email = email;
             resolve(true);
           }, 1000);
         });
@@ -129,10 +134,15 @@ export class LoginComponent {
       allowOutsideClick: () => !Swal.isLoading()
     }).then((result) => {
       if (result.isConfirmed) {
-        Swal.fire({
-          title: 'Email enviado',
-          text: 'Se ha enviado un enlace de recuperación a su correo electrónico',
-          icon: 'success'
+        this.loginService.solicitarRecuperacion(req).subscribe({
+          next: (response) => {
+            Swal.fire({
+              title: 'Solicitud recibida',
+              text: response.mensaje,
+              icon: 'success'
+            });
+
+          }
         });
       }
     });
