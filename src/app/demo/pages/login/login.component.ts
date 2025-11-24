@@ -43,23 +43,24 @@ export class LoginComponent {
     this.mostrarPassword = !this.mostrarPassword;
   }
 
+  // =========================
+  //   LOGIN
+  // =========================
   onLogin() {
     if (this.loginForm.valid) {
       this.isLoading = true;
       this.spinner.show();
 
-      // Simular llamada al servicio de autenticación
       const loginData = {
         username: this.f['username'].value,
         password: this.f['password'].value,
         recordarSesion: this.f['recordarSesion'].value
       };
 
-      console.log('Datos de login:', loginData);
       this.loginService.loginUsuario(loginData).subscribe({
         next: (response) => {
           console.log('Respuesta del servidor:', response);
-          localStorage.setItem("token", response.token)
+          localStorage.setItem('token', response.token);
           this.isLoading = false;
           this.spinner.hide();
           Swal.fire({
@@ -67,8 +68,6 @@ export class LoginComponent {
             text: 'Inicio de sesión exitoso',
             icon: 'success'
           }).then(() => {
-            // Aquí redirigirías al usuario al dashboard
-            console.log('Redirigir al dashboard');
             this.isLoading = false;
             this.router.navigate(['/inicio']);
           });
@@ -76,10 +75,31 @@ export class LoginComponent {
         error: (error) => {
           this.spinner.hide();
           this.isLoading = false;
-          console.error('Error en la autenticación:', error);
+
+          console.error('Error completo en la autenticación:', error);
+
+          // 👇 AQUÍ LEEMOS EL MENSAJE QUE MANDA EL BACKEND
+          // Probamos varias opciones: error.error.mensaje, error.error.message, error.message
+          let mensajeBackend: string = 'Usuario o contraseña incorrectos';
+
+          if (error?.error) {
+            if (typeof error.error === 'string') {
+              // Si el backend devolvió solo texto plano
+              mensajeBackend = error.error;
+            } else if (error.error.mensaje) {
+              // Caso en que el backend mande { mensaje: '...' }
+              mensajeBackend = error.error.mensaje;
+            } else if (error.error.message) {
+              // Caso típico de Spring Boot: { message: '...' }
+              mensajeBackend = error.error.message;
+            }
+          } else if (error?.message) {
+            mensajeBackend = error.message;
+          }
+
           Swal.fire({
-            title: 'Erro',
-            text: 'Ups! Algo salió mal durante el inicio de sesión.',
+            title: 'Error de autenticación',
+            text: mensajeBackend,
             icon: 'error'
           });
         }
@@ -87,7 +107,6 @@ export class LoginComponent {
     } else {
       this.spinner.hide();
       this.isLoading = false;
-      // Marcar todos los campos como tocados para mostrar errores
       this.loginForm.markAllAsTouched();
       Swal.fire({
         title: 'Error',
@@ -97,44 +116,67 @@ export class LoginComponent {
     }
   }
 
+  // =========================
+  //   OLVIDÉ MI CONTRASEÑA
+  // =========================
   onForgotPassword(event: Event) {
     event.preventDefault();
 
     Swal.fire({
       title: 'Recuperar contraseña',
-      text: 'Ingrese su correo electrónico para recuperar su contraseña',
-      input: 'email',
+      text: 'Ingrese su nombre de usuario para recuperar su contraseña',
+      input: 'text',
       inputAttributes: {
         autocapitalize: 'off',
-        placeholder: 'correo@ejemplo.com'
+        placeholder: 'Nombre de usuario'
       },
       showCancelButton: true,
       confirmButtonText: 'Enviar',
-      cancelButtonText: 'Cancelar',
-      showLoaderOnConfirm: true,
-      preConfirm: (email) => {
-        if (!email) {
-          Swal.showValidationMessage('El correo electrónico es requerido');
-          return false;
-        }
-
-        // Simular envío de email de recuperación
-        return new Promise<boolean>((resolve) => {
-          setTimeout(() => {
-            console.log('Enviar email de recuperación a:', email);
-            resolve(true);
-          }, 1000);
-        });
-      },
-      allowOutsideClick: () => !Swal.isLoading()
+      cancelButtonText: 'Cancelar'
     }).then((result) => {
-      if (result.isConfirmed) {
-        Swal.fire({
-          title: 'Email enviado',
-          text: 'Se ha enviado un enlace de recuperación a su correo electrónico',
-          icon: 'success'
-        });
+      if (!result.isConfirmed) {
+        return;
       }
+
+      const username = result.value;
+
+      if (!username) {
+        Swal.fire({
+          title: 'Dato requerido',
+          text: 'Debe ingresar el nombre de usuario.',
+          icon: 'warning'
+        });
+        return;
+      }
+
+      this.titleSpinner = 'Procesando recuperación...';
+      this.spinner.show();
+
+      this.loginService.recuperarContrasena(username).subscribe({
+        next: (resp) => {
+          this.spinner.hide();
+
+          Swal.fire({
+            title: 'Recuperación de contraseña',
+            text: resp?.mensaje || 'Si el usuario existe, se enviará un correo con instrucciones.',
+            icon: 'info'
+          });
+        },
+        error: (error) => {
+          console.error('Error en recuperación de contraseña:', error);
+          this.spinner.hide();
+
+          // Mensaje genérico, sin revelar si el usuario existe o no
+          Swal.fire({
+            title: 'Recuperación de contraseña',
+            text: 'Si el usuario existe, se enviará un correo con instrucciones.',
+            icon: 'info'
+          });
+        }
+      });
     });
   }
 }
+
+
+

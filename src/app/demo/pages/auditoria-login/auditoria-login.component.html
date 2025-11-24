@@ -1,0 +1,85 @@
+<div class="container mt-3">
+  <h2>Auditoría de Login</h2>
+
+  <!-- Filtros -->
+  <form [formGroup]="filtrosForm" class="row g-3 mb-3">
+
+    <div class="col-md-4">
+      <label class="form-label">Usuario</label>
+      <input
+        class="form-control"
+        formControlName="username"
+        placeholder="usuario">
+    </div>
+
+    <div class="col-md-4">
+      <label class="form-label">Fecha desde</label>
+      <input
+        type="date"
+        class="form-control"
+        formControlName="fechaDesde">
+    </div>
+
+    <div class="col-md-4">
+      <label class="form-label">Fecha hasta</label>
+      <input
+        type="date"
+        class="form-control"
+        formControlName="fechaHasta">
+    </div>
+  </form>
+
+  <!-- Mensaje de carga -->
+  <div *ngIf="cargando" class="alert alert-info">
+    Cargando registros de auditoría...
+  </div>
+
+  <!-- Tabla de resultados -->
+  <table class="table table-striped" *ngIf="!cargando && logs.length > 0">
+    <thead>
+      <tr>
+        <th>Fecha</th>
+        <th>Usuario</th>
+        <th>IP</th>
+        <th>Descripción</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr *ngFor="let log of logs">
+        <td>{{ log.fecha | date:'short' }}</td>
+        <td>{{ log.username }}</td>
+        <td>{{ log.ip }}</td>
+        <td>{{ log.descripcion }}</td>
+      </tr>
+    </tbody>
+  </table>
+
+  <!-- Mensaje cuando no hay datos -->
+  <div *ngIf="!cargando && logs.length === 0" class="alert alert-warning">
+    No se encontraron registros con esos filtros.
+  </div>
+
+  <!-- Paginación -->
+  <div class="d-flex justify-content-between align-items-center mt-2">
+    <div>
+      Página {{ pageIndex + 1 }}
+      <span *ngIf="totalElements"> - Total: {{ totalElements }} registros</span>
+    </div>
+    <div>
+      <button
+        class="btn btn-outline-secondary btn-sm me-2"
+        (click)="cambiarPagina(-1)"
+        [disabled]="pageIndex === 0">
+        Anterior
+      </button>
+
+      <button
+        class="btn btn-outline-secondary btn-sm"
+        (click)="cambiarPagina(1)"
+        [disabled]="(pageIndex + 1) * pageSize >= totalElements">
+        Siguiente
+      </button>
+    </div>
+  </div>
+</div>
+

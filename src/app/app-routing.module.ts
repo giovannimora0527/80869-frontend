@@ -11,6 +11,9 @@ import { HistoriaComponent } from './demo/pages/historia/historia.component';
 import { MedicamentoComponent } from './demo/pages/medicamento/medicamento.component';
 import { LoginComponent } from './demo/pages/login/login.component';
 
+// 👇 IMPORTA el nuevo componente
+import { AuditoriaLoginComponent } from './demo/pages/auditoria-login/auditoria-login.component';
+
 export const routes: Routes = [
   {
     path: '',
@@ -34,8 +37,10 @@ export const routes: Routes = [
        { path: 'medicamento', component: MedicamentoComponent, data: { title: 'Medicamento' }},
        { path: 'formula-medica', component: FormulaComponent, data: { title: 'Formula' }},
        { path: 'historia-clinica', component: HistoriaComponent, data: { title: 'Historia' }},
-       { path: 'especializacion', component: EspecializacionComponent, data: { title: 'Especializacion' }}
+       { path: 'especializacion', component: EspecializacionComponent, data: { title: 'Especializacion' }},
 
+       // 👇 NUEVA RUTA
+       { path: 'auditoria-login', component: AuditoriaLoginComponent, data: { title: 'Auditoria Login' }}
     ]
   },
   { path: '**', redirectTo: 'login' }
@@ -46,3 +51,4 @@ export const routes: Routes = [
   exports: [RouterModule]
 })
 export class AppRoutingModule {}
+
